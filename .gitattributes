@@ -1,0 +1,13 @@
+* text=auto eol=lf
+
+*.patch   text eol=lf
+*.md      text eol=lf
+*.sh      text eol=lf
+*.py      text eol=lf
+*.mk      text eol=lf
+*.xml     text eol=lf
+
+*.png     binary
+*.gz-dtb  binary
+*.so      binary
+*.zip     binary

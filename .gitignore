@@ -1,0 +1,16 @@
+# 构建产物
+out/
+*.img
+*.img.md5
+!screenshots/*.png
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Python
+__pycache__/
+*.pyc

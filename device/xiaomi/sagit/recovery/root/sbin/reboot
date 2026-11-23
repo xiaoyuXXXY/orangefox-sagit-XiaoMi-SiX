@@ -1,0 +1,14 @@
+#!/sbin/sh
+# OrangeFox sagit v31: robust reboot for zip installer scripts.
+# Method 1: direct kernel syscall via foxb_reboot (no init / property service
+#           dependency, same behaviour as busybox reboot in old recoveries).
+# Method 2: AOSP property-based /system/bin/reboot as fallback.
+LOG=/tmp/recovery.log
+echo "REBOOT-WRAP: called with args: $*" >> "$LOG" 2>/dev/null
+sync
+if /system/bin/foxb_reboot "$@" >> "$LOG" 2>&1; then
+    echo "REBOOT-WRAP: direct syscall reboot issued" >> "$LOG" 2>/dev/null
+    exit 0
+fi
+echo "REBOOT-WRAP: direct syscall failed, falling back to /system/bin/reboot" >> "$LOG" 2>/dev/null
+exec /system/bin/reboot "$@"

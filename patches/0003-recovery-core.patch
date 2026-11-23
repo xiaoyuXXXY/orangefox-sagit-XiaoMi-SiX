@@ -1,0 +1,358 @@
+diff --git a/data.cpp b/data.cpp
+index 1d995b7c6..24a2d7eb3 100755
+--- a/data.cpp
++++ b/data.cpp
+@@ -1259,7 +1259,8 @@ void DataManager::SetDefaultValues()
+   mPersist.SetValue(TW_TIME_ZONE_VAR, OF_DEFAULT_TIMEZONE);
+   mPersist.SetValue(TW_TIME_ZONE_GUISEL, OF_DEFAULT_TIMEZONE);
+   mPersist.SetValue(TW_TIME_ZONE_GUIOFFSET, "0");
+-  mPersist.SetValue(TW_TIME_ZONE_GUIDST, "1");
++  /* FOX: default timezone has no DST component (China, UTC+8), keep DST off */
++  mPersist.SetValue(TW_TIME_ZONE_GUIDST, "0");
+   #ifdef OF_NO_REFLASH_CURRENT_ORANGEFOX
+ 	mPersist.SetValue(TW_AUTO_REFLASHTWRP_VAR, "0");
+   #else
+diff --git a/gui/gui.cpp b/gui/gui.cpp
+index e03fe91fb..f07d834d4 100644
+--- a/gui/gui.cpp
++++ b/gui/gui.cpp
+@@ -472,6 +472,39 @@ void InputHandler::process_EV_KEY(input_event& ev)
+ 			kb->KeyUp(KEY_BACK);
+ 	} else if (ev.value != 0) {
+ 		// This is a key press
++		/* FOX: instant flashlight toggle on "Volume-Up + Power".
++		   The stock implementation only fires after a 200ms hold, which makes a
++		   quick tap do nothing. Detect the combo as soon as the second key of
++		   the pair goes down (within 400ms of the first), so one tap turns the
++		   flashlight on and the next tap turns it off. */
++		if (ev.code == KEY_VOLUMEUP || ev.code == KEY_POWER) {
++			static long long volup_down_ms = 0, power_down_ms = 0;
++			long long now_ms = nowMs();
++			bool combo = false;
++
++			if (ev.code == KEY_VOLUMEUP) {
++				combo = kb->IsKeyDown(KEY_POWER) && power_down_ms > 0 &&
++						(now_ms - power_down_ms) <= 400;
++				volup_down_ms = now_ms;
++			} else {
++				combo = kb->IsKeyDown(KEY_VOLUMEUP) && volup_down_ms > 0 &&
++						(now_ms - volup_down_ms) <= 400;
++				power_down_ms = now_ms;
++			}
++
++			if (combo && DataManager::GetStrValue("of_flashlight_enable") == "1") {
++				LOGEVENT("FOX: flashlight combo (single tap)\n");
++				GUIAction::flashlightImpl("");
++				DataManager::Vibrate("tw_button_vibrate");
++				// Do not let the power key turn the screen off on release
++				g_suppress_power_toggle_until_ms = now_ms + 800;
++				// Block the press-and-hold handler from firing this combo twice
++				key_status = KS_KEY_REPEAT;
++				mime = 0;
++				touch_status = TS_NONE;
++				return;
++			}
++		}
+ #ifdef TW_USE_KEY_CODE_TOUCH_SYNC
+ 		if (ev.code == TW_USE_KEY_CODE_TOUCH_SYNC) {
+ 			LOGEVENT("key code %i key press == touch start %i %i\n", TW_USE_KEY_CODE_TOUCH_SYNC, x, y);
+diff --git a/orangefox.mk b/orangefox.mk
+index 7dfccd406..c6a23a068 100644
+--- a/orangefox.mk
++++ b/orangefox.mk
+@@ -571,7 +571,8 @@ endif
+ ifneq ($(OF_DEFAULT_TIMEZONE),)
+     LOCAL_CFLAGS += -DOF_DEFAULT_TIMEZONE='"$(OF_DEFAULT_TIMEZONE)"'
+ else
+-    LOCAL_CFLAGS += -DOF_DEFAULT_TIMEZONE='"CET-1;CEST,M3.5.0,M10.5.0"'
++    # sagit: default to China Standard Time (UTC+8), no DST
++    LOCAL_CFLAGS += -DOF_DEFAULT_TIMEZONE='"CST-8"'
+ endif
+ 
+ # support fs compression (requires kernel support and appropriate fstab flags)
+@@ -762,6 +763,13 @@ ifeq ($(OF_FORCE_DATA_FORMAT_F2FS),1)
+     LOCAL_CFLAGS += -DOF_FORCE_DATA_FORMAT_F2FS
+ endif
+ 
++# devices with old f2fs support (kernel < 4.14) cannot mount a filesystem
++# created with the android default profile, because it enables quota/verity.
++# With this flag, make_f2fs is limited to encrypt+extra_attr.
++ifeq ($(OF_F2FS_LEGACY_FEATURES),1)
++    LOCAL_CFLAGS += -DOF_F2FS_LEGACY_FEATURES
++endif
++
+ # whether to force ext4 when formatting data
+ ifeq ($(OF_FORCE_DATA_FORMAT_EXT4),1)
+     ifeq ($(OF_FORCE_DATA_FORMAT_F2FS),1)
+diff --git a/recovery_main.cpp b/recovery_main.cpp
+index 80cba61d3..9f2c3e3d8 100644
+--- a/recovery_main.cpp
++++ b/recovery_main.cpp
+@@ -342,6 +342,30 @@ int main(int argc, char** argv) {
+   std::vector<std::string> args = get_args(argc, argv, &stage);
+   auto args_to_parse = StringVectorToNullTerminatedArray(args);
+ 
++  // A bare "boot-recovery" BCB is what our own reboot-to-recovery path leaves in
++  // /misc (see TWFunc::tw_reboot). Consume it right away: the bootloader has
++  // already done its part, and keeping it around would send the next reboot back
++  // into recovery. BCBs carrying arguments (OTA "--update_package=...") are left
++  // untouched for the normal recovery flow. TWRP's fstab is not an fs_mgr one, so
++  // resolve /misc by hand and fall back to the by-name node.
++  {
++    std::string bcb_err;
++    std::string misc_dev = get_bootloader_message_blk_device(&bcb_err);
++    if (misc_dev.empty()) {
++      misc_dev = "/dev/block/bootdevice/by-name/misc";
++    }
++    bootloader_message boot = {};
++    if (read_bootloader_message_from(&boot, misc_dev, &bcb_err) &&
++        strncmp(boot.command, "boot-recovery", sizeof(boot.command)) == 0 &&
++        boot.recovery[0] == '\0') {
++      if (write_bootloader_message_to(bootloader_message{}, misc_dev, &bcb_err)) {
++        LOG(INFO) << "Cleared bare boot-recovery BCB left by reboot-to-recovery";
++      } else {
++        LOG(ERROR) << "Failed to clear BCB: " << bcb_err;
++      }
++    }
++  }
++
+   static constexpr struct option OPTIONS[] = {
+     { "fastboot", no_argument, nullptr, 0 },
+     { "locale", required_argument, nullptr, 0 },
+diff --git a/sepolicy/twrp.te b/sepolicy/twrp.te
+index e791fa43f..cc2e488df 100644
+--- a/sepolicy/twrp.te
++++ b/sepolicy/twrp.te
+@@ -6,6 +6,7 @@ recovery_only(`
+   permissive fastbootd;
+   permissive postinstall;
+   permissive ueventd;
++  allow recovery self:capability sys_boot;
+   allow kernel unlabeled:file rw_file_perms;
+   allow kernel tmpfs:file { read };
+   allow kernel recovery:fd { use };
+diff --git a/twrp-functions.cpp b/twrp-functions.cpp
+index 0a8605af0..3d63fda90 100755
+--- a/twrp-functions.cpp
++++ b/twrp-functions.cpp
+@@ -444,7 +444,7 @@ int TWFunc::Exec_Cmd(const string& cmd, bool Show_Errors) {
+ 	pid_t pid;
+ 	int status;
+ 	string tmp = "/sbin/sh";
+-	if (!Path_Exists(tmp))
++	if (!Path_Exists(tmp) || access(tmp.c_str(), X_OK) != 0)
+ 	   tmp = "/system/bin/sh";
+ 	
+ 	switch(pid = fork())
+@@ -1151,10 +1151,34 @@ int TWFunc::tw_reboot(RebootCommand command)
+ #else
+ 			return reboot(RB_AUTOBOOT);
+ #endif
+-		case rb_recovery:
++		case rb_recovery: {
+       			if (DoDeactivate == 1) { Deactivation_Process(); } 
+ 			check_and_run_script("/system/bin/rebootrecovery.sh", "reboot recovery");
++			// Legacy path: leave a bare "boot-recovery" BCB in /misc and do a
++			// *plain* reboot. The bootloader then walks its full boot path
++			// (splash -> kernel -> recovery) instead of jumping straight to the
++			// recovery partition through the restart reason, which only makes
++			// the logo flash for a moment.
++			std::string bcb_err;
++			std::vector<std::string> bcb_opts{"boot-recovery"};
++			bool bcb_ok = write_bootloader_message(bcb_opts, &bcb_err);
++			if (!bcb_ok) {
++				// TWRP's /etc/recovery.fstab is not an fs_mgr fstab, so the generic
++				// lookup above can fail on this device; retry on the by-name node.
++				bcb_err.clear();
++				bcb_ok = write_bootloader_message_to(bcb_opts,
++				                                     "/dev/block/bootdevice/by-name/misc",
++				                                     &bcb_err);
++			}
++			if (bcb_ok) {
++				LOGINFO("tw_reboot: BCB written, doing a plain reboot into recovery\n");
++				sync();
++				return property_set(ANDROID_RB_PROPERTY, "reboot,");
++			}
++			LOGINFO("tw_reboot: could not write BCB (%s), falling back to restart reason\n",
++			        bcb_err.c_str());
+ 			return property_set(ANDROID_RB_PROPERTY, "reboot,recovery");
++		}
+ 		case rb_bootloader:
+ 			check_and_run_script("/system/bin/rebootbootloader.sh", "reboot bootloader");
+ 			return property_set(ANDROID_RB_PROPERTY, "reboot,bootloader");
+@@ -2099,20 +2123,25 @@ int TWFunc::Set_Brightness(std::string brightness_value)
+ bool TWFunc::Toggle_MTP(bool enable)
+ {
+ #ifdef TW_HAS_MTP
+-  static int was_enabled = false;
++  static int was_enabled = -1;
+ 
+-  if (enable && was_enabled)
++  if (enable)
+     {
+-      if (!PartitionManager.Enable_MTP())
+-	PartitionManager.Disable_MTP();
++      if (was_enabled == 1)
++        {
++          if (!PartitionManager.Enable_MTP())
++            PartitionManager.Disable_MTP();
++        }
++      was_enabled = -1;  // let the next suspension read the preference again
+     }
+   else
+     {
+-      was_enabled = DataManager::GetIntValue("tw_mtp_enabled");
+-      PartitionManager.Disable_MTP();
++      if (was_enabled < 0)
++        was_enabled = DataManager::GetIntValue("tw_mtp_enabled");
++      PartitionManager.Disable_MTP(true);  // temporary: keep the user's setting
+       usleep(500);
+     }
+-  return was_enabled;
++  return was_enabled == 1;
+ #else
+   return false;
+ #endif
+@@ -4618,8 +4647,10 @@ string s = Fox_Bin_Dir + "/magiskboot";
+ 
+ // hopefully, this function will be obsolete one day ... //
+ void TWFunc::Setup_Verity_Forced_Encryption(void) {
+-  DataManager::SetValue(FOX_DISABLE_DM_VERITY, "0");
+-  DataManager::SetValue(FOX_DISABLE_FORCED_ENCRYPTION, "0");
++  // 不在每次启动强制清零。这两个开关是用户选择，保存在 settings 文件里，
++  // 默认值 "0" 已经由 DataManager 初始化（data.cpp）写入。
++  // 此处再清零会导致：用户开启 -> 重启 Recovery -> 又被改回 0，
++  // 刷包时读到的值是 0，于是完全不做 PATCH（实测现象）。
+   #ifdef FOX_VANILLA_BUILD
+   DataManager::SetValue(FOX_ADVANCED_STOCK_REPLACE, "0");
+   #endif
+diff --git a/twrp.cpp b/twrp.cpp
+index 6f9e85852..d3287b1da 100644
+--- a/twrp.cpp
++++ b/twrp.cpp
+@@ -20,6 +20,7 @@
+ */
+ 
+ #include <stdio.h>
++#include <string.h>
+ #include <stdlib.h>
+ #include <string>
+ #include <sys/stat.h>
+@@ -58,6 +59,7 @@ extern "C" {
+ #endif
+ #include "openrecoveryscript.hpp"
+ #include "variables.h"
++#include "bootloader_message/include/bootloader_message/bootloader_message.h"
+ #include "startupArgs.hpp"
+ #include "twrpAdbBuFifo.hpp"
+ #ifdef TW_USE_NEW_MINADBD
+@@ -300,7 +302,7 @@ static void process_recovery_mode(twrpAdbBuFifo* adb_bu_fifo, bool skip_decrypti
+ 		if (!PartitionManager.Enable_MTP())
+ 			PartitionManager.Disable_MTP();
+ 		else
+-			gui_msg("mtp_enabled=MTP Enabled");
++			LOGINFO("MTP enabled silently at boot\n");
+ 		property_set("mtp.crash_check", "0");
+ 	} else if (strcmp(mtp_crash_check, "0")) {
+ 		gui_warn("mtp_crash=MTP Crashed, not starting MTP on boot.");
+@@ -423,6 +425,27 @@ int main(int argc, char **argv) {
+ 	// avoid Android 15 QPR2 problem with rogue xml file
+ 	Fox_Remove_Problematic_File();
+ 
++	// A bare "boot-recovery" BCB is what TWFunc::tw_reboot(rb_recovery) leaves
++	// behind so the bootloader walks its full boot path. TWRP itself never
++	// consumes that message, so clear it here -- otherwise the next reboot would
++	// come straight back into recovery. BCBs carrying arguments (an OTA
++	// "--update_package=...") are left alone.
++	{
++		std::string bcb_err;
++		std::string misc_dev = get_bootloader_message_blk_device(&bcb_err);
++		if (misc_dev.empty())
++			misc_dev = "/dev/block/bootdevice/by-name/misc";
++		bootloader_message boot = {};
++		if (read_bootloader_message_from(&boot, misc_dev, &bcb_err) &&
++		    strncmp(boot.command, "boot-recovery", sizeof(boot.command)) == 0 &&
++		    boot.recovery[0] == '\0') {
++			if (write_bootloader_message_to(bootloader_message{}, misc_dev, &bcb_err))
++				LOGINFO("Cleared bare boot-recovery BCB left by reboot-to-recovery\n");
++			else
++				LOGINFO("Failed to clear boot-recovery BCB: %s\n", bcb_err.c_str());
++		}
++	}
++
+ 	// Recovery needs to install world-readable files, so clear umask
+ 	// set by init
+ 	umask(0);
+@@ -526,6 +549,18 @@ int main(int argc, char **argv) {
+ 	// Load default values to set DataManager constants and handle ifdefs
+ 	DataManager::SetDefaultValues();
+ 
++	/* FOX: default timezone is China Standard Time (UTC+8). Devices that ran an
++	   older build have the European default persisted, so migrate it once. */
++	{
++		std::string tz = DataManager::GetStrValue(TW_TIME_ZONE_VAR);
++		if (tz.empty() || tz == "CET-1;CEST,M3.5.0,M10.5.0") {
++			DataManager::SetValue(TW_TIME_ZONE_VAR, "CST-8");
++			DataManager::SetValue(TW_TIME_ZONE_GUISEL, "CST-8");
++			DataManager::SetValue(TW_TIME_ZONE_GUIDST, "0");
++			DataManager::update_tz_environment_variables();
++		}
++	}
++
+ 	startupArgs startup;
+ 	startup.parse(&argc, &argv);
+ 	android::base::SetProperty(TW_FASTBOOT_MODE_PROP, startup.Get_Fastboot_Mode() ? "1" : "0");
+@@ -550,6 +585,12 @@ int main(int argc, char **argv) {
+ 
+ 	if (!startup.Get_Fastboot_Mode()) PartitionManager.Setup_Fstab_Partitions(true);
+ 
++	/* FOX: mount internal storage (/storage -> /data/media/0) by default so the
++	   user does not have to tick it manually on the Mount page every boot.
++	   Do it before the theme is loaded, so the Mount page shows it ticked. */
++	if (!startup.Get_Fastboot_Mode())
++		PartitionManager.Mount_By_Path("/storage", false);
++
+ 	// Load up all the resources
+ 	gui_loadResources();
+ 
+@@ -631,6 +672,19 @@ int main(int argc, char **argv) {
+ 		process_recovery_mode(adb_bu_fifo, startup.Should_Skip_Decryption());
+ 	}
+ #ifndef FOX_ALLOW_EARLY_SETTINGS_LOAD
++	// The recovery settings file lives on /data (plus a copy on /persist) and
++	// survives reflashing, so a machine that has been running an English-default
++	// build keeps "en" forever, even when the new image ships a different default.
++	// Only an explicit pick from the UI sets "fox_lang_user"; without it we force
++	// the build default on every boot. That covers a fresh flash, a data format
++	// and a stale settings file alike -- all land on Chinese with no manual step.
++	if (DataManager::GetIntValue("fox_lang_user") != 1) {
++		std::string Build_Lang = EXPAND(TW_DEFAULT_LANGUAGE);
++		if (DataManager::GetStrValue("tw_language") != Build_Lang) {
++			LOGINFO("LANG: forcing build default '%s' (no user selection recorded)\n", Build_Lang.c_str());
++			DataManager::SetValue("tw_language", Build_Lang);
++		}
++	}
+ 	// Language
+ 	PageManager::LoadLanguage(DataManager::GetStrValue("tw_language"));
+ 	GUIConsole::Translate_Now();
+@@ -640,11 +694,17 @@ int main(int argc, char **argv) {
+ 
+ 	// Launch the main GUI
+ 	if (Fox_CheckReload_Themes()) {
+-		//[f/d] Start UI using reapply_settings page (executed on recovery startup)
++		// Reload the theme, but start on the main menu instead of the
++		// "reapply_settings" splash. That page only exists to show the
++		// "Successfully decrypted!" notice while the reload runs: on startup
++		// check_and_reload() returns immediately (of_decrypt_from_menu == 0), and
++		// PageManager::Update() fires RunReload() on the first frame anyway, which
++		// reloads the theme and lands on of_reload_back. Starting on main skips the
++		// pointless full-screen page without losing the reload.
+ 		DataManager::SetValue("of_reload_back", "main");
+ 		PageManager::RequestReload();
+-		gui_startPage("reapply_settings", 1, 0);
+-	} else gui_start();
++	}
++	gui_start();
+ 
+ 	delete adb_bu_fifo;
+ 	TWFunc::Update_Intent_File(startup.Get_Intent());

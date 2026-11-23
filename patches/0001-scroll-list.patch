@@ -1,0 +1,258 @@
+diff --git a/gui/fileselector.cpp b/gui/fileselector.cpp
+index 152d750ff..ce51f8c96 100644
+--- a/gui/fileselector.cpp
++++ b/gui/fileselector.cpp
+@@ -449,6 +449,10 @@ void GUIFileSelector::SetPageFocus(int inFocus)
+ 			DataManager::SetValue(mPathVar, mPathDefault);
+ 		updateFileList = true;
+ 		mUpdate = 1;
++		// reset scroll to top when entering file page
++		firstDisplayedItem = 0;
++		y_offset = 0;
++		scrollingSpeed = 0;
+ 	}
+ }
+ 
+diff --git a/gui/listbox.cpp b/gui/listbox.cpp
+index 426810be4..702c06f3c 100644
+--- a/gui/listbox.cpp
++++ b/gui/listbox.cpp
+@@ -370,7 +370,7 @@ int GUIListBox::NotifyVarChange(const std::string& varName, const std::string& v
+ 				mUpdate = 1;
+ 			}
+ 		}
+-		else if (varName == mVariable) {
++		else if (!mVariable.empty() && varName == mVariable) {
+ 			if (item.variableValue == currentValue) {
+ 				item.selected = 1;
+ 				SetVisibleListLocation(mVisibleItems.empty() ? 0 : mVisibleItems.size()-1);
+@@ -404,6 +404,14 @@ void GUIListBox::SetPageFocus(int inFocus)
+ 		}
+ 		DataManager::GetValue(mVariable, currentValue);
+ 		NotifyVarChange(mVariable, currentValue);
++		// 页面获得焦点时强制回到列表顶部：没有 <data> 绑定的列表，mVariable 为空，
++		// 上面的刷新会把每一项（变量值也是空）都判定为选中，从而把视图拉到最末项
++		if (firstDisplayedItem != 0 || y_offset != 0) {
++			firstDisplayedItem = 0;
++			y_offset = 0;
++			scrollingSpeed = 0;
++			mUpdate = 1;
++		}
+ 	}
+ }
+ 
+diff --git a/gui/objects.hpp b/gui/objects.hpp
+index bdf35bd6d..b1047820f 100644
+--- a/gui/objects.hpp
++++ b/gui/objects.hpp
+@@ -637,6 +637,12 @@ protected:
+ 	// Returns the size in pixels of a partial item or row size
+ 	int GetDisplayRemainder();
+ 
++	// True when every row fits in the viewport without scrolling
++	bool ItemsFitWindow();
++
++	// True when the group padding has to be dropped so that all rows fit
++	bool SkipGroupPadding();
++
+ protected:
+ 	// Background
+ 	COLOR mBackgroundColor;
+diff --git a/gui/scrolllist.cpp b/gui/scrolllist.cpp
+index 2b0694138..5718b3e7d 100755
+--- a/gui/scrolllist.cpp
++++ b/gui/scrolllist.cpp
+@@ -229,6 +229,45 @@ int GUIScrollList::Render(void)
+ 	if (!isConditionTrue())
+ 		return 0;
+ 
++	// [Xiaoyu] No-overscroll guarantee.
++	// The list "fits" when the rows themselves fit in the viewport. In that case
++	// the group padding must never create a scroll range, otherwise the list can
++	// be dragged/bounced through empty padding even though every row is visible
++	// (this was the flash-image partition list bug).
++	bool xItemsFit = ItemsFitWindow();
++	if (xItemsFit) {
++		firstDisplayedItem = 0;
++		y_offset = 0;
++		scrollingSpeed = 0;
++	} else {
++		if (firstDisplayedItem < 0) firstDisplayedItem = 0;
++		// TOP edge: y_offset must never be > 0
++		if (firstDisplayedItem == 0 && y_offset > 0) {
++			y_offset = 0;
++			scrollingSpeed = 0;
++		}
++		// BOTTOM edge: never scroll past last item
++		int xTotal = (int)GetItemCount();
++		int xWinH = mRenderH - mHeaderH;
++		int xTotalH = xTotal * actualItemHeight;
++		if (isGroup)
++			xTotalH += mItemPaddingTop + mItemPaddingBottom;
++		int xMaxTop = xTotalH - xWinH;
++		int xCurTop = firstDisplayedItem * actualItemHeight - y_offset;
++		if (isGroup && firstDisplayedItem > 0)
++			xCurTop += mItemPaddingTop;
++		if (xCurTop > xMaxTop) {
++			if (isGroup && xMaxTop > mItemPaddingTop) {
++				firstDisplayedItem = (xMaxTop - mItemPaddingTop) / actualItemHeight;
++				y_offset = -((xMaxTop - mItemPaddingTop) % actualItemHeight);
++			} else {
++				firstDisplayedItem = xMaxTop / actualItemHeight;
++				y_offset = -(xMaxTop % actualItemHeight);
++			}
++			scrollingSpeed = 0;
++		}
++	}
++
+ 	// First step, fill background
+ 	gr_color(mBackgroundColor.red, mBackgroundColor.green, mBackgroundColor.blue, mBackgroundColor.alpha);
+ 	gr_fill(mRenderX, mRenderY + mHeaderH, mRenderW, mRenderH - mHeaderH);
+@@ -253,11 +292,8 @@ int GUIScrollList::Render(void)
+ 	int listW = mRenderW; // this is only used for the separators - the list items are rendered in the full width of the list
+ 
+ 	int windowH = mRenderH - mHeaderH;
+-	int totalHeight = listSize * actualItemHeight;
+-	if (isGroup)
+-		totalHeight += mItemPaddingTop + mItemPaddingBottom;
+ 
+-	if (totalHeight <= windowH) {
++	if (xItemsFit) {
+ 		hasScroll = false;
+ 		scrollingSpeed = 0;
+ 		lines = listSize;
+@@ -272,6 +308,10 @@ int GUIScrollList::Render(void)
+ 			lines = listSize - firstDisplayedItem;
+ 	}
+ 
++	// When the rows fit but the group padding would overflow the viewport, drop
++	// the padding so every row stays fully visible without scrolling.
++	bool xSkipGroupPad = SkipGroupPadding();
++
+ 	int yPos = mRenderY + mHeaderH + y_offset;
+ 
+ 	// render all visible items
+@@ -296,7 +336,7 @@ int GUIScrollList::Render(void)
+ 		}
+ 
+ 		// Apply top padding for the first item in a group
+-		if (groupStatus == 1 || groupStatus == 4) {
++		if ((groupStatus == 1 || groupStatus == 4) && !xSkipGroupPad) {
+ 			yPos += mItemPaddingTop;
+ 		}
+ 
+@@ -310,7 +350,7 @@ int GUIScrollList::Render(void)
+ 		yPos += actualItemHeight;
+ 
+ 		// Apply bottom padding for the last item in a group
+-		if (groupStatus == 3 || groupStatus == 4) {
++		if ((groupStatus == 3 || groupStatus == 4) && !xSkipGroupPad) {
+ 			yPos += mItemPaddingBottom;
+ 		}
+ 	}
+@@ -573,7 +613,7 @@ size_t GUIScrollList::HitTestItem(int x __unused, int y)
+ 	// Locate the correct item
+ 	size_t actualSelection = firstDisplayedItem;
+ 	int selectY = y_offset;
+-	if (isGroup && actualSelection == 0)
++	if (isGroup && actualSelection == 0 && !SkipGroupPadding())
+ 		selectY += mItemPaddingTop;
+ 
+ 	while (selectY + actualItemHeight < startSelection) {
+@@ -658,7 +698,27 @@ int GUIScrollList::NotifyTouch(TOUCH_STATE state, int x, int y)
+ 		selectedItem = NO_ITEM; // nothing is selected because we dragged too far
+ 		// Handle scrolling
+ 		if (hasScroll) {
+-			y_offset += y - lastY; // adjust the scrolling offset based on the difference between the starting touch and the current touch
++			int deltaY = y - lastY; // adjust the scrolling offset based on the difference between the starting touch and the current touch
++			// [Xiaoyu] block overscroll at the very top/bottom at the source.
++			// HandleScrolling() clamps *after* y_offset has already gone past the
++			// edge, which makes the list visibly bounce back (e.g. flash image list).
++			// Ignore the drag increment entirely once we are pinned to an edge.
++			int xyyTotal = (int)GetItemCount();
++			int xyyWinH = mRenderH - mHeaderH;
++			int xyyTotalH = xyyTotal * actualItemHeight;
++			if (isGroup)
++				xyyTotalH += mItemPaddingTop + mItemPaddingBottom;
++			if (xyyTotalH > xyyWinH) {
++				int xyyMaxTop = xyyTotalH - xyyWinH;
++				int xyyCurTop = firstDisplayedItem * actualItemHeight - y_offset;
++				if (isGroup && firstDisplayedItem > 0)
++					xyyCurTop += mItemPaddingTop;
++				if (deltaY < 0 && xyyCurTop >= xyyMaxTop)   // finger up -> toward bottom
++					deltaY = 0;
++				if (deltaY > 0 && firstDisplayedItem == 0 && y_offset >= 0) // finger down -> toward top
++					deltaY = 0;
++			}
++			y_offset += deltaY;
+ 			last2Y = lastY; // keep track of previous y locations so that we can tell how fast to scroll for kinetic scrolling
+ 			lastY = y; // update last touch to the current touch so we can tell how far and what direction we scroll for the next touch event
+ 
+@@ -691,8 +751,18 @@ int GUIScrollList::NotifyTouch(TOUCH_STATE state, int x, int y)
+ 		} else {
+ 			// Start kinetic scrolling
+ 			scrollingSpeed = lastY - last2Y;
++			if (!hasScroll)
++				scrollingSpeed = 0;
+ 			if (abs(scrollingSpeed) < touchDebounce)
+ 				scrollingSpeed = 0;
++			// [Xiaoyu] stop kinetic scrolling at list edges so it stops exactly
++			// at bottom/top instead of bouncing past the end
++			int xyyListCnt = (int)GetItemCount();
++			int xyyLines = GetDisplayItemCount();
++			if (scrollingSpeed < 0 && xyyListCnt > 0 && firstDisplayedItem + xyyLines >= xyyListCnt - 1)
++				scrollingSpeed = 0;
++			if (scrollingSpeed > 0 && firstDisplayedItem == 0)
++				scrollingSpeed = 0;
+ 		}
+ 	case TOUCH_REPEAT:
+ 	//case TOUCH_HOLD:
+@@ -703,6 +773,15 @@ int GUIScrollList::NotifyTouch(TOUCH_STATE state, int x, int y)
+ 
+ void GUIScrollList::HandleScrolling()
+ {
++	// Nothing to scroll when all rows fit: keep the list pinned at the top so
++	// padding can never be dragged into view (no rubber-band bounce at all).
++	if (ItemsFitWindow()) {
++		firstDisplayedItem = 0;
++		y_offset = 0;
++		scrollingSpeed = 0;
++		return;
++	}
++
+ 	// handle dragging downward, scrolling upward
+ 	// the offset should always be <= 0 and > -actualItemHeight, adjust the first display row and offset as needed
+ 	while (firstDisplayedItem && y_offset > 0) {
+@@ -744,7 +823,7 @@ void GUIScrollList::HandleScrolling()
+ 		if (isGroup && firstDisplayedItem > 0)
+ 			currentPos += mItemPaddingTop;
+ 
+-		if (currentPos > totalHeight - windowH) {
++		if (currentPos >= totalHeight - windowH) {
+ 			int newTopPos = totalHeight - windowH;
+ 			if (isGroup && newTopPos > mItemPaddingTop) {
+ 				firstDisplayedItem = (newTopPos - mItemPaddingTop) / actualItemHeight;
+@@ -773,6 +852,23 @@ int GUIScrollList::GetDisplayRemainder()
+ 	return (mRenderH - mHeaderH) % actualItemHeight;
+ }
+ 
++bool GUIScrollList::ItemsFitWindow()
++{
++	if (GetItemCount() == 0)
++		return true;
++	return (int)GetItemCount() * actualItemHeight <= (mRenderH - mHeaderH);
++}
++
++bool GUIScrollList::SkipGroupPadding()
++{
++	if (!isGroup || GetItemCount() == 0)
++		return false;
++	int winH = mRenderH - mHeaderH;
++	int itemsH = (int)GetItemCount() * actualItemHeight;
++	// Only drop the padding when it is what makes the content overflow
++	return itemsH <= winH && itemsH + mItemPaddingTop > winH;
++}
++
+ int GUIScrollList::NotifyVarChange(const std::string& varName, const std::string& value)
+ {
+ 	GUIObject::NotifyVarChange(varName, value);

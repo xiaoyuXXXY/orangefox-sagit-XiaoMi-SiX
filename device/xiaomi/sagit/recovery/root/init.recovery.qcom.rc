@@ -1,0 +1,137 @@
+# Copyright (c) 2009-2012, 2014-2015, The Linux Foundation. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of The Linux Foundation nor
+#       the names of its contributors may be used to endorse or promote
+#       products derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NON-INFRINGEMENT ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+on early-init
+    # ramdisk 打包时 sbin 下的文件可能丢失可执行位，这里补回来
+    chmod 0755 /sbin/bash
+    chmod 0755 /sbin/sgdisk
+    chmod 0755 /sbin/fox_resize_system.sh
+    chmod 0755 /sbin/fox_sysinfo.sh
+    chmod 0755 /sbin/mke2fs
+    chmod 0755 /sbin/make_f2fs
+    chmod 0644 /sbin/mke2fs.conf
+    # /etc 是指向 /system/etc 的软链，system 分区一旦被挂载，
+    # /etc/mke2fs.conf 就变成空分区里的文件，mke2fs 会直接 exit 1
+    # （表现就是「格式化 Data 失败 / 进程错误结束: 1」）。
+    # 固定指向 ramdisk 里的副本，彻底摆脱挂载状态影响。
+    export MKE2FS_CONFIG /sbin/mke2fs.conf
+    mkdir /firmware 0771 system system
+    # The qcom FBE helpers were built against /sbin/linker64; make sure that
+    # path resolves when they are launched from /system/bin.
+    symlink /system/bin/linker64 /sbin/linker64
+
+on fs
+    wait /dev/block/platform/soc/1da4000.ufshc
+    symlink /dev/block/platform/soc/1da4000.ufshc /dev/block/bootdevice
+    chmod 0660 /dev/qseecom
+    chown system drmrpc /dev/qseecom
+    chmod 0664 /dev/ion
+    chown system system /dev/ion
+    install_keyring
+
+    setprop crypto.ready 1
+
+# Separate copy needed to use /sbin/linker64 instead of /system/bin/linker64
+service sbinqseecomd /sbin/qseecomd
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service hwservicemanager /sbin/hwservicemanager
+    user root
+    group root
+    disabled
+    onrestart setprop hwservicemanager.ready false
+    seclabel u:r:recovery:s0
+
+service servicemanager /sbin/servicemanager
+    user root
+    group root readproc
+    disabled
+    seclabel u:r:recovery:s0
+
+service keystore_auth /sbin/keystore_auth
+    oneshot
+    user system
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service keystore /sbin/keystore /tmp/misc/keystore
+    user root
+    group root drmrpc readproc
+    disabled
+    seclabel u:r:recovery:s0
+
+service gatekeeper-1-0 /sbin/android.hardware.gatekeeper@1.0-service
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service keymaster-3-0 /sbin/android.hardware.keymaster@3.0-service
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+on boot
+    # Workaround for adb not coming up
+    setprop sys.usb.config mtp,adb
+    setprop sys.usb.config adb
+
+    # No OTG power switch is needed here. This kernel's charger driver is
+    # smblib/SMB138X and exposes no otg_switch / usb_otg node at all (the
+    # legacy qpnp-smb2 line in the R10 tree was dead code from another
+    # device). The Type-C port already comes up as source and the U disk is
+    # enumerated by xhci within ~7s; role switching is handled by
+    # TWPartitionManager::Check_UsbOtg_Status(), which drops the adb/mtp
+    # gadget (Toggle_MTP(false)) right before mounting.
+
+    # Enable Double tap to wake
+    write /proc/touchpanel/double_tap_enable 1
+
+on property:crypto.ready=0
+    stop sbinqseecomd
+    stop keymaster-3-0
+    stop gatekeeper-1-0
+    stop hwservicemanager
+    stop keystore
+    stop servicemanager
+
+on property:crypto.ready=1
+    start sbinqseecomd
+
+on property:vendor.sys.listeners.registered=true
+    start hwservicemanager
+    start keymaster-3-0
+    start gatekeeper-1-0
+    start servicemanager
+
+# Qualcomm FBE decryption services (qseecomd / keymaster / gatekeeper)
+import /init.recovery.qcom_decrypt.rc

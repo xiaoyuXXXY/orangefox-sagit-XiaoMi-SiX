@@ -1,0 +1,511 @@
+diff --git a/partition.cpp b/partition.cpp
+index ef691b53f..3607d0bed 100644
+--- a/partition.cpp
++++ b/partition.cpp
+@@ -29,6 +29,7 @@
+ #include <sys/vfs.h>
+ #include <unistd.h>
+ #include <dirent.h>
++#include <errno.h>
+ #include <fcntl.h>
+ #include <grp.h>
+ #include <iostream>
+@@ -778,6 +779,33 @@ void TWPartition::Setup_Data_Partition(bool Display_Error) {
+ 		Recreate_Media_Folder();
+ 	}
+ #endif
++	if (datamedia)
++		Remove_Legacy_Media_Symlink();
++}
++
++void TWPartition::Remove_Legacy_Media_Symlink(void) {
++	// v21 created a "/data/Media -> media" symlink while chasing a message
++	// that turned out to be a bad translation rather than a missing path.
++	// Clean up that leftover, but only if it is exactly the link we made.
++	string Legacy_Path = Mount_Point + "/Media";
++	struct stat st;
++
++	if (!Mount(false)) {
++		LOGINFO("Skipping legacy media symlink cleanup, %s is not mounted\n", Mount_Point.c_str());
++		return;
++	}
++	if (lstat(Legacy_Path.c_str(), &st) != 0 || !S_ISLNK(st.st_mode))
++		return;
++
++	char target[256] = {0};
++	ssize_t len = readlink(Legacy_Path.c_str(), target, sizeof(target) - 1);
++	if (len <= 0 || string(target) != "media")
++		return;
++
++	if (unlink(Legacy_Path.c_str()) == 0)
++		LOGINFO("Removed leftover compatibility symlink '%s'\n", Legacy_Path.c_str());
++	else
++		LOGERR("Could not remove leftover symlink '%s' (%s)\n", Legacy_Path.c_str(), strerror(errno));
+ }
+ 
+ void TWPartition::Set_FBE_Status() {
+@@ -1317,7 +1345,9 @@ void TWPartition::Setup_Data_Media() {
+ 			Storage_Path = Mount_Point + "/media/0";
+ 			Symlink_Path = Storage_Path;
+ 			DataManager::SetValue(TW_INTERNAL_PATH, Mount_Point + "/media/0");
++		#ifndef OF_FIX_DECRYPTION_ON_DATA_MEDIA
+ 			UnMount(true);
++		#endif
+ 		}
+ 		DataManager::SetValue("tw_has_internal", 1);
+ 		DataManager::SetValue("tw_has_data_media", 1);
+@@ -1871,7 +1901,7 @@ bool TWPartition::Wipe(string New_File_System) {
+ 		}
+ 	}
+ 
+-	if (Has_Data_Media && Current_File_System == New_File_System) {
++	if (Has_Data_Media && Current_File_System == New_File_System && !Force_FS_Rebuild) {
+ 		wiped = Wipe_Data_Without_Wiping_Media();
+ 
+ 		if (Mount_Point == "/data" && TWFunc::get_log_dir() == DATA_LOGS_DIR) {
+@@ -1883,6 +1913,16 @@ bool TWPartition::Wipe(string New_File_System) {
+ 	} else {
+ 		DataManager::GetValue(TW_RM_RF_VAR, check);
+ 
++		/* FOX: "Change File System" must build the requested filesystem, so it
++		   ignores the global rm -rf preference. "Format Data" keeps honouring
++		   it (fast wipe, keeps format and crypto key). */
++		if (Ignore_Rm_Rf && (check || Use_Rm_Rf)) {
++			LOGINFO("FOX: ignoring 'use rm -rf instead of formatting' for %s, rebuilding %s\n",
++					Mount_Point.c_str(), New_File_System.c_str());
++			check = 0;
++			Use_Rm_Rf = false;
++		}
++
+ 		if (Mount_Point == "/storage")
+ 		  {
+ 	   	    LOGINFO("DEBUG - OrangeFox: wiping /storage with \"rm -rf\" ... \n");
+@@ -2233,6 +2273,7 @@ bool TWPartition::Decrypt(string Password) {
+ bool TWPartition::Wipe_Encryption() {
+ 	bool Save_Data_Media = Has_Data_Media;
+ 	bool ret = false;
++	bool wiped_ok = false;
+ 	std::string the_wipe_fs;
+ 
+ 	if (TWFunc::Block_Operations_Until_Reboot())
+@@ -2243,7 +2284,15 @@ bool TWPartition::Wipe_Encryption() {
+ #elif defined(OF_FORCE_DATA_FORMAT_EXT4)
+ 	the_wipe_fs = "ext4";
+ #else
+-	the_wipe_fs = Fstab_File_System;
++	/* Use the filesystem that is actually on the partition, not the literal
++	   fstab string. With "auto" in the fstab, Fstab_File_System is the word
++	   "auto", which Wipe() cannot dispatch on and would fail on. blkid gives
++	   us the real type (ext4 / f2fs), so "Format Data" rebuilds whatever the
++	   user is currently using instead of locking the format. */
++	Check_FS_Type();
++	the_wipe_fs = Current_File_System;
++	if (the_wipe_fs.empty() || the_wipe_fs == "auto")
++		the_wipe_fs = "ext4";
+ #endif
+ 	BasePartition* base_partition = make_partition();
+ 
+@@ -2277,21 +2326,41 @@ bool TWPartition::Wipe_Encryption() {
+ 	gui_print("DEBUG: Format_Target_File_System=%s\n", the_wipe_fs.c_str());
+ #endif
+ 
+-	if (Wipe(the_wipe_fs)) {
++	/* FOX: "Format Data" must not fall into the "just delete files" shortcut,
++	   otherwise the old (possibly broken) superblock stays in place. It still
++	   honours the global rm -rf preference, handled inside Wipe(). */
++	Force_FS_Rebuild = true;
++	wiped_ok = Wipe(the_wipe_fs);
++	Force_FS_Rebuild = false;
++
++	if (wiped_ok) {
+ 		Has_Data_Media = Save_Data_Media;
+ 		DataManager::SetValue(TW_IS_ENCRYPTED, 0);
++		/* FOX: the partition has just been wiped, so it is no longer encrypted.
++		   Reset the FBE flag, otherwise Recreate_Media_Folder() bails out and
++		   /data/media never comes back after a format. */
++		Is_FBE = false;
++		DataManager::SetValue(TW_IS_FBE, 0);
+ #ifndef TW_OEM_BUILD
+-		gui_msg("format_data_msg=You may need to reboot recovery to be able to use /data again.");
++		gui_msg("format_data_msg=Formatting finished - internal storage has been recreated.");
+ #endif
+-		if (Is_FBE) {
+-		    if (DataManager::GetIntValue(FOX_DISABLE_FORCED_ENCRYPTION) != 1) {
+-			gui_msg(Msg(msg::kWarning, "data_media_fbe_msg=OrangeFox will not recreate /data/media on an FBE device. Please reboot into your rom to create /data/media."));
+-		    }
+-		} else {
+-			if (Has_Data_Media && !Symlink_Mount_Point.empty()) {
+-				if (Mount(false))
+-					PartitionManager.Add_MTP_Storage(MTP_Storage_ID);
++		if (Mount_Point == "/data" && Has_Data_Media) {
++			/* FOX: rebuild /data/media right away and keep /data mounted, so the
++			   user does not have to reboot recovery before internal storage works. */
++			if (Mount(true)) {
++				Recreate_Media_Folder();
++				if (TWFunc::Path_Exists(Mount_Point + "/media/0")) {
++					Storage_Path = Mount_Point + "/media/0";
++					Symlink_Path = Storage_Path;
++					DataManager::SetValue(TW_INTERNAL_PATH, Storage_Path);
++				}
++				PartitionManager.Add_MTP_Storage(MTP_Storage_ID);
++			} else {
++				LOGERR("FOX: unable to mount %s after format\n", Mount_Point.c_str());
+ 			}
++		} else if (Has_Data_Media && !Symlink_Mount_Point.empty()) {
++			if (Mount(false))
++				PartitionManager.Add_MTP_Storage(MTP_Storage_ID);
+ 		}
+ 		ret = true;
+ 		if (!Key_Directory.empty())
+@@ -2358,6 +2427,41 @@ void TWPartition::Check_FS_Type() {
+ 	}
+ }
+ 
++// OrangeFox: 把某个块设备上的所有挂载点全部卸掉。
++// TWPartition::UnMount() 只处理分区本身的挂载点，而 /sdcard、/storage 这类
++// bind mount 的 source 也是同一个设备，会一直挂着。此时 mke2fs 即使带 -F
++// 也会直接拒绝："is mounted; will not make a filesystem here!"。
++// 返回仍然挂着的挂载点数量（0 表示已卸干净）。
++static int Fox_Force_Unmount_Device(const std::string& dev) {
++	if (dev.empty())
++		return 0;
++	int remaining = 0;
++	for (int round = 0; round < 6; ++round) {
++		std::vector<std::string> mps;
++		FILE* fp = fopen("/proc/mounts", "rt");
++		if (!fp)
++			break;
++		char line[4096];
++		while (fgets(line, sizeof(line), fp)) {
++			char src[512] = {0};
++			char mp[512] = {0};
++			if (sscanf(line, "%511s %511s", src, mp) == 2 && dev == src && mp[0] == '/')
++				mps.push_back(mp);
++		}
++		fclose(fp);
++		if (mps.empty())
++			return 0;
++		remaining = (int)mps.size();
++		for (size_t i = 0; i < mps.size(); ++i) {
++			LOGINFO("OrangeFox: force-unmount '%s' (device %s)\n", mps[i].c_str(), dev.c_str());
++			if (umount2(mps[i].c_str(), 0) != 0)
++				umount2(mps[i].c_str(), MNT_DETACH);
++		}
++		usleep(200000);
++	}
++	return remaining;
++}
++
+ bool TWPartition::Wipe_EXTFS(string File_System) {
+ 	if (!UnMount(true))
+ 		return false;
+@@ -2402,19 +2506,25 @@ bool TWPartition::Wipe_EXTFS(string File_System) {
+ 	string size_str = dout;
+ 	string Command;
+ 
+-	#ifdef OF_UNBIND_SDCARD_F2FS
+-	if (Mount_Point == "/data") {
+-		LOGINFO("OrangeFox: trying to unmount %s (again) before extFS data format...\n", Display_Name.c_str());
+-		usleep(32768);
+-		TWFunc::Exec_Cmd("umount " + Actual_Block_Device + " > /dev/null 2>&1", false);
+-		usleep(32768);
++	// OrangeFox: 格式化前把该设备上的所有挂载点（含 bind mount）卸干净。
++	// 原来的写法是 umount /dev/block/sdaNN，但 umount 在设备被多处挂载时
++	// 无法定位目标，等于没做；这里改成遍历 /proc/mounts 按设备逐条卸载。
++	if (Mount_Point == "/data" || Mount_Point == "/sdcard" || Mount_Point == "/storage") {
++		sync();
++		int left = Fox_Force_Unmount_Device(Actual_Block_Device);
++		if (left > 0)
++			LOGINFO("OrangeFox: %d mount point(s) still busy on %s\n", left, Actual_Block_Device.c_str());
++		else
++			LOGINFO("OrangeFox: all mount points on %s released\n", Actual_Block_Device.c_str());
+ 	}
+-	#endif
+ 
+ 	gui_msg(Msg("formatting_using=Formatting {1} using {2}...")(Display_Name)("mke2fs"));
+ 
+ 	// Execute mke2fs to create empty ext4 filesystem (enable projid by default)
+-	Command = "mke2fs -t " + File_System + " -b 4096 -I 512";
++	// -F is required: otherwise mke2fs asks "Proceed anyway? (y,N)" when the
++	// partition already holds another filesystem, and with no stdin in recovery
++	// it exits without writing anything, silently leaving /data unmountable.
++	Command = "mke2fs -F -t " + File_System + " -b 4096 -I 512";
+ 	if (Needs_Metadata_Csum) {
+ 		Command += " -O metadata_csum,64bit,extent";
+ 	}
+@@ -2625,9 +2735,18 @@ bool TWPartition::Wipe_F2FS() {
+ 	* Your device tree should include this:
+ 		$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+ 	*/
+-	if (TWFunc::Path_Exists("/system/bin/make_f2fs"))
++	if (TWFunc::Path_Exists("/system/bin/make_f2fs")) {
++#ifdef OF_F2FS_LEGACY_FEATURES
++		/* FOX: sagit runs a 4.4 kernel whose f2fs driver has no quota/verity
++		   support. The android default profile (-g android) turns on
++		   encrypt+quota+verity, which makes the result unmountable, so use the
++		   minimal set this kernel understands (-f also overwrites an existing
++		   filesystem without asking, which recovery cannot answer). */
++		f2fs_command = "/system/bin/make_f2fs -f -O encrypt,extra_attr";
++#else
+ 		f2fs_command = "/system/bin/make_f2fs -g android";
+-	else {
++#endif
++	} else {
+ 		LOGINFO("mkfs_f2fs binary not found, using rm -rf to wipe.\n");
+ 		return Wipe_RMRF();
+ 	}
+@@ -2641,6 +2760,21 @@ bool TWPartition::Wipe_F2FS() {
+ 		return false;
+ 	}
+ 
++	/* FOX V45-4: "Change File System" to F2FS on an encrypted /data failed with
++	   make_f2fs rc=-1, because UnMount(true) alone cannot release the bind mounts
++	   (/sdcard, /storage, and the /mnt/runtime bind mounts) on the data block
++	   device. The user's workaround was "format first, then change FS" -- formatting
++	   goes through Wipe_EXTFS() which already force-unmounts by device (V45-2).
++	   Apply the same logic here so a direct FS change works in one step. */
++	if (Mount_Point == "/data" || Mount_Point == "/sdcard" || Mount_Point == "/storage") {
++		sync();
++		int left = Fox_Force_Unmount_Device(Actual_Block_Device);
++		if (left > 0)
++			LOGINFO("OrangeFox: %d mount point(s) still busy on %s before f2fs format\n", left, Actual_Block_Device.c_str());
++		else
++			LOGINFO("OrangeFox: all mount points on %s released before f2fs format\n", Actual_Block_Device.c_str());
++	}
++
+     	if (!Needs_Fs_Compress) {
+     		Needs_Fs_Compress = android::base::GetBoolProperty("vold.has_compress", false);
+     		if (Needs_Fs_Compress)
+@@ -2660,10 +2794,15 @@ bool TWPartition::Wipe_F2FS() {
+ 		Length < 0 ? dev_sz += Length : dev_sz -= CRYPT_FOOTER_OFFSET;
+ 
+ 	char dev_sz_str[48];
+-	sprintf(dev_sz_str, "%llu", (dev_sz / 4096));
++	/* make_f2fs takes the size in 512-byte sectors, not 4K blocks. The old
++	   dev_sz / 4096 made the filesystem 8x smaller than the partition (112G ->
++	   ~14G). */
++	sprintf(dev_sz_str, "%llu", (dev_sz / 512));
+ 
++#ifndef OF_F2FS_LEGACY_FEATURES
+ 	// Project ID
+ 	f2fs_command += " -O project_quota,extra_attr";
++#endif
+ 
+ 	// Casefolding for /data
+ 	if (needs_casefold)
+@@ -2688,6 +2827,16 @@ bool TWPartition::Wipe_F2FS() {
+ 		NeedPreserveFooter = false;
+ 	}
+ 	LOGINFO("mkfs_f2fs command: %s\n", f2fs_command.c_str());
++	/* FOX: capture the tool output. When the format fails, the reason ends up
++	   on the screen and in recovery.log instead of a silent "Unable to wipe". */
++	std::string f2fs_logged_cmd = f2fs_command + " > /tmp/f2fs_format.log 2>&1";
++	int f2fs_rc = TWFunc::Exec_Cmd(f2fs_logged_cmd, false);
++	if (f2fs_rc != 0) {
++		std::string f2fs_out;
++		TWFunc::Exec_Cmd("tail -n 5 /tmp/f2fs_format.log", f2fs_out);
++		LOGERR("make_f2fs failed (rc=%d): %s\n", f2fs_rc, f2fs_out.c_str());
++		gui_print("make_f2fs rc=%d\n%s\n", f2fs_rc, f2fs_out.c_str());
++	}
+ 
+ 	// try to unbind /sdcard if it is still bind-mounted
+ 	#ifdef OF_UNBIND_SDCARD_F2FS
+@@ -2714,9 +2863,13 @@ bool TWPartition::Wipe_F2FS() {
+ 	}
+ 	#endif
+ 
+-	if (TWFunc::Exec_Cmd(f2fs_command) == 0) {
++	if (f2fs_rc == 0) {
+ 		if (NeedPreserveFooter)
+ 			Wipe_Crypto_Key();
++		/* The partition is f2fs from now on. Without this, Current_File_System
++		   would still hold the old value (ext4, or "auto" from the fstab) and
++		   the Mount() that follows the wipe would try to mount it as ext4. */
++		Current_File_System = "f2fs";
+ 		Recreate_AndSec_Folder();
+ 		gui_msg("done=Done.");
+ 		return true;
+@@ -3431,10 +3584,15 @@ void TWPartition::Recreate_Media_Folder(void) {
+ 		LOGINFO("Recreating %s folder.\n", Media_Path.c_str());
+ 		mkdir(Media_Path.c_str(), 0770);
+ 		string Internal_path = DataManager::GetStrValue("tw_internal_path");
+-		if (!Internal_path.empty()) {
+-			LOGINFO("Recreating %s folder.\n", Internal_path.c_str());
+-			mkdir(Internal_path.c_str(), 0770);
+-		}
++		/* FOX: after a format, tw_internal_path can be empty because it is only
++		   filled in when /data/media/0 already existed at boot. That left the
++		   internal storage without /media/0 until recovery was restarted. */
++		if (Internal_path.empty())
++			Internal_path = Mount_Point + "/media/0";
++		LOGINFO("Recreating %s folder.\n", Internal_path.c_str());
++		mkdir(Internal_path.c_str(), 0770);
++		chown(Media_Path.c_str(), 1023, 1023);
++		chown(Internal_path.c_str(), 1023, 1023);
+ #ifdef TW_INTERNAL_STORAGE_PATH
+ 		mkdir(EXPAND(TW_INTERNAL_STORAGE_PATH), 0770);
+ #endif
+diff --git a/partitionmanager.cpp b/partitionmanager.cpp
+index b52a7d491..5cf1852c9 100755
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -709,7 +709,7 @@ void TWPartitionManager::Decrypt_Data() {
+ 		if (Decrypt_Data->Is_FBE) {
+ 			if (DataManager::GetIntValue(TW_CRYPTO_PWTYPE) == 0) {
+ 				if (Decrypt_Device("!") == 0) {
+-					gui_msg("decrypt_success=Successfully decrypted with default password.");
++					LOGINFO("decrypt_success: Successfully decrypted with default password.\n");
+ 					DataManager::SetValue(TW_IS_ENCRYPTED, 0);
+ 				} else {
+ 					gui_err("unable_to_decrypt=Unable to decrypt with default password.");
+@@ -723,7 +723,7 @@ void TWPartitionManager::Decrypt_Data() {
+ 			if (password_type == CRYPT_TYPE_DEFAULT) {
+ 				LOGINFO("Device is encrypted with the default password, attempting to decrypt.\n");
+ 				if (Decrypt_Device("default_password") == 0) {
+-					gui_msg("decrypt_success=Successfully decrypted with default password.");
++					LOGINFO("decrypt_success: Successfully decrypted with default password.\n");
+ 					DataManager::SetValue(TW_IS_ENCRYPTED, 0);
+ 				} else {
+ 					gui_err("unable_to_decrypt=Unable to decrypt with default password.");
+@@ -1797,8 +1797,17 @@ int TWPartitionManager::Wipe_By_Path(string Path, string New_File_System) {
+ 		if ((*iter)->Mount_Point == Local_Path || (!(*iter)->Symlink_Mount_Point.empty() && (*iter)->Symlink_Mount_Point == Local_Path)) {
+ 			if (Path == "/and-sec")
+ 				ret = (*iter)->Wipe_AndSec();
+-			else
++			else {
++				/* FOX: an explicit "Change File System" request always means
++				   "rebuild as this filesystem", even when the partition is
++				   already using it. Otherwise Wipe() degrades to rm -rf and
++				   the format never changes. */
++				(*iter)->Force_FS_Rebuild = true;
++				(*iter)->Ignore_Rm_Rf = true;
+ 				ret = (*iter)->Wipe(New_File_System);
++				(*iter)->Force_FS_Rebuild = false;
++				(*iter)->Ignore_Rm_Rf = false;
++			}
+ 			found = true;
+ 		} else if ((*iter)->Is_SubPartition && (*iter)->SubPartition_Of == Local_Path) {
+ 			(*iter)->Wipe(New_File_System);
+@@ -2179,9 +2188,9 @@ void TWPartitionManager::Post_Decrypt(const string& Block_Device) {
+ 		dat->Is_Decrypted = true;
+ 		if (!Block_Device.empty()) {
+ 			dat->Decrypted_Block_Device = Block_Device;
+-			gui_msg(Msg("decrypt_success_dev=Data successfully decrypted, new block device: '{1}'")(Block_Device));
++			LOGINFO("decrypt_success_dev: Data successfully decrypted, new block device: '%s'\n", Block_Device.c_str());
+ 		} else {
+-			gui_msg("decrypt_success_nodev=Data successfully decrypted");
++			LOGINFO("decrypt_success_nodev: Data successfully decrypted\n");
+ 		}
+ 		property_set("twrp.decrypt.done", "true");
+ 		dat->Setup_File_System(false);
+@@ -3160,7 +3169,7 @@ void TWPartitionManager::Add_All_MTP_Storage(void) {
+ #endif
+ }
+ 
+-bool TWPartitionManager::Disable_MTP(void) {
++bool TWPartitionManager::Disable_MTP(bool keep_setting) {
+ 	char old_value[PROPERTY_VALUE_MAX];
+ 	property_set("sys.usb.ffs.mtp.ready", "0");
+ 	property_get("sys.usb.config", old_value, "");
+@@ -3190,7 +3199,11 @@ bool TWPartitionManager::Disable_MTP(void) {
+ #endif
+ 	property_set("sys.usb.config", "adb");
+ #ifdef TW_HAS_MTP
+-	DataManager::SetValue("tw_mtp_enabled", 0);
++	// Only forget the user's preference when MTP is really being turned off.
++	// Temporary suspensions (USB-OTG, UMS) pass keep_setting=true, otherwise
++	// plugging a U disk in once would disable MTP for good.
++	if (!keep_setting)
++		DataManager::SetValue("tw_mtp_enabled", 0);
+ 	return true;
+ #endif
+ 	return false;
+@@ -4881,8 +4894,10 @@ bool TWPartitionManager::Check_Pending_Merges() {
+ }
+ 
+ void TWPartitionManager::Check_UsbOtg_Status() {
+-	static bool mtp_was_enabled;
++	static bool mtp_was_enabled = false;
++	static bool mtp_toggled = false;
+ 	static bool usbotg_mounted = false;
++	static int usbotg_retry = 0;
+ 	static string usbotg_prim = "";
+ 	static string usbotg_alt = "";
+ 	static TWPartition* usbotg = Find_Partition_By_Path("usb_otg");
+@@ -4902,9 +4917,27 @@ void TWPartitionManager::Check_UsbOtg_Status() {
+ 	return;
+ 
+ mount:
+-	mtp_was_enabled = TWFunc::Toggle_MTP(false);
+-	usbotg->Mount(true);
++	if (!mtp_toggled) {
++		mtp_was_enabled = TWFunc::Toggle_MTP(false);
++		mtp_toggled = true;
++	}
++	// The block device node can appear a moment before its partition is
++	// scanned, and blkid needs a readable device to detect the filesystem.
++	// The stock code latched usbotg_mounted to true even when Mount()
++	// failed, so a U disk plugged in before/while recovery finishes booting
++	// was never retried until the cable was pulled. Keep the flag false on
++	// failure and try again on the next tick.
++	if (!usbotg->Mount(false)) {
++		usbotg_retry++;
++		if (usbotg_retry == 1 || (usbotg_retry % 5) == 0)
++			LOGINFO("usb_otg: mount attempt %d failed (dev=%s, fs=%s), will retry\n",
++				usbotg_retry, usbotg->Actual_Block_Device.c_str(), usbotg->Current_File_System.c_str());
++		return;
++	}
++	LOGINFO("usb_otg: mounted %s (%s) on attempt %d\n", usbotg->Actual_Block_Device.c_str(),
++		usbotg->Current_File_System.c_str(), usbotg_retry + 1);
+ 	usbotg_mounted = true;
++	usbotg_retry = 0;
+ 	if (PageManager::GetCurrentPage() == "filemanagerlist" && DataManager::GetStrValue("tw_file_location1") == "/usb_otg")
+ 		gui_changePage("filemanagerlist");
+ 	return;
+@@ -4916,6 +4949,8 @@ unmount:
+ 	usbotg->Used = 0;
+ 	usbotg->Free = 0;
+ 	usbotg_mounted = false;
++	mtp_toggled = false;
++	usbotg_retry = 0;
+ 	if (PageManager::GetCurrentPage() == "filemanagerlist" && DataManager::GetStrValue("tw_file_location1") == "/usb_otg")
+ 		gui_changePage("filemanagerlist");
+ 	TWFunc::Toggle_MTP(mtp_was_enabled);
+diff --git a/partitions.hpp b/partitions.hpp
+index ea1f80b03..4885575d6 100644
+--- a/partitions.hpp
++++ b/partitions.hpp
+@@ -166,6 +166,7 @@ public:
+ 	void Check_FS_Type();                                                     // Checks the fs type using blkid, does not do anything on MTD / yaffs2 because this crashes on some devices
+ 	bool Update_Size(bool Display_Error);                                     // Updates size information
+ 	void Recreate_Media_Folder();                                             // Recreates the /data/media folder
++	void Remove_Legacy_Media_Symlink();                                       // Removes the leftover /data/Media -> media link created by v21
+ 
+ 	bool Flash_Image(PartitionSettings *part_settings);                       // Flashes an image to the partition
+ 	void Change_Mount_Read_Only(bool new_value);                              // Changes Mount_Read_Only to new_value
+@@ -187,6 +188,16 @@ public:
+ 
+ public:
+ 	string Current_File_System;                                               // Current file system
++	/* FOX: set when the user explicitly asks for a rebuild (Format Data /
++	   Change File System). Without it, Wipe() sees New_File_System ==
++	   Current_File_System and silently degrades to "delete files only",
++	   so the partition keeps its old format and never gets re-created. */
++	bool Force_FS_Rebuild = false;
++	/* FOX: only "Change File System" ignores the global "use rm -rf instead
++	   of formatting" setting. "Format Data" still honours it, so users who
++	   prefer a fast wipe (keeping the current format and crypto key) keep
++	   that behaviour. */
++	bool Ignore_Rm_Rf = false;
+ 	string Actual_Block_Device;                                               // Actual block device (one of primary, alternate, or decrypted)
+ 	string Backup_Display_Name;                                               // Name displayed in the partition list for backup selection
+ 	string MTD_Name;                                                          // Name of the partition for MTD devices
+@@ -407,7 +418,7 @@ public:
+ 	void Output_Storage_Fstab();                                              // Creates a /cache/recovery/storage.fstab file with a list of all potential storage locations for app use
+ 	bool Enable_MTP();                                                        // Enables MTP
+ 	void Add_All_MTP_Storage();                                               // Adds all storage objects for MTP
+-	bool Disable_MTP();                                                       // Disables MTP
++	bool Disable_MTP(bool keep_setting = false);                              // Disables MTP; keep_setting leaves tw_mtp_enabled untouched
+ 	bool Add_MTP_Storage(string Mount_Point);                                 // Adds or removes an MTP Storage partition
+ 	bool Add_MTP_Storage(unsigned int Storage_ID);                            // Adds or removes an MTP Storage partition
+ 	bool Remove_MTP_Storage(string Mount_Point);                              // Adds or removes an MTP Storage partition

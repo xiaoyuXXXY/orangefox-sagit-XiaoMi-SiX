@@ -1,0 +1,930 @@
+diff --git a/gui/theme/common/languages/ar_SA.xml b/gui/theme/common/languages/ar_SA.xml
+index 8eccc0fb5..2dc11909f 100644
+--- a/gui/theme/common/languages/ar_SA.xml
++++ b/gui/theme/common/languages/ar_SA.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">بحث عن الملفات والمجلدات...</string>
+ 		
+ 		<string name="reboot_to_take_effect">إعادة التشغيل لتطبيق التغييرات</string>
+-		<string name="fox_modules_hdr">إضافات Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">تثبيت الإضافة</string>
+ 		<string name="backup_short_hdr">نسخ احتياطي جديد</string>
+ 		<string name="backups_wat">أين هي النسخ الاحتياطية?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">إزالة الوحدة في بدء التشغيل التالي</string>
+ 		<string name="mm_remove_hint">إعادة التشغيل لبدء تطبيق التغييرات</string>
+ 		<string name="mm_remove_reboot">إعادة التشغيل</string>
+-		<string name="magisk_not_found">لم يتم العثور على Magisk!</string>
+-		<string name="magisk_not_found_1">هل تريد الذهاب إلى إضافة Fox</string>
+-		<string name="magisk_not_found_2">وتثبيت Magisk الجاهز مسبقًا؟</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">وحدات APatch</string>
+diff --git a/gui/theme/common/languages/bg_BG.xml b/gui/theme/common/languages/bg_BG.xml
+index e38238f64..be6ee0808 100644
+--- a/gui/theme/common/languages/bg_BG.xml
++++ b/gui/theme/common/languages/bg_BG.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Търсене на файлове и папки...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Рестартирайте за влизане в сила на промените</string>
+-		<string name="fox_modules_hdr">Fox добавки</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Инсталиране на добавка</string>
+ 		<string name="backup_short_hdr">Нов архив</string>
+ 		<string name="backups_wat">Къде са архивите?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Премахни модула при следващото стартиране</string>
+ 		<string name="mm_remove_hint">Рестартирайте за влизане в сила на промените</string>
+ 		<string name="mm_remove_reboot">Рестарт</string>
+-		<string name="magisk_not_found">Magisk не е открит!</string>
+-		<string name="magisk_not_found_1">Искате ли да отидете в Fox Addons</string>
+-		<string name="magisk_not_found_2">и да инсталирате предварително построен Magisk?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch модули</string>
+diff --git a/gui/theme/common/languages/bn_BD.xml b/gui/theme/common/languages/bn_BD.xml
+index 423c015c9..be72e53fb 100644
+--- a/gui/theme/common/languages/bn_BD.xml
++++ b/gui/theme/common/languages/bn_BD.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">ফাইল এবং ফোল্ডার অনুসন্ধান করুন...</string>
+ 		
+ 		<string name="reboot_to_take_effect">পরিবর্তনগুলি কার্যকর করতে রিবুট করুন</string>
+-		<string name="fox_modules_hdr">ফক্স অ্যাডঅন্স</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">অ্যাডঅন ইনস্টল করুন</string>
+ 		<string name="backup_short_hdr">নতুন ব্যাকআপ</string>
+ 		<string name="backups_wat">ব্যাকআপগুলি কোথায়?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">পরবর্তী বুটে মডিউল সরান</string>
+ 		<string name="mm_remove_hint">পরিবর্তনগুলি কার্যকর করতে পুনরায় বুট করুন</string>
+ 		<string name="mm_remove_reboot">রিবুট</string>
+-		<string name="magisk_not_found">ম্যাজিস্ক পাওয়া যায়নি!</string>
+-		<string name="magisk_not_found_1">আপনি ফক্স অ্যাডঅনস এ যেতে চান</string>
+-		<string name="magisk_not_found_2">এবং প্রিবিল্ট ম্যাজিস্ক ইনস্টল করুন?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch মডিউল</string>
+diff --git a/gui/theme/common/languages/ca_ES.xml b/gui/theme/common/languages/ca_ES.xml
+index 0c8b9266d..339c52b55 100644
+--- a/gui/theme/common/languages/ca_ES.xml
++++ b/gui/theme/common/languages/ca_ES.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Cercar fitxers i carpetes...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Reinicia perquè els canvis tinguin efecte</string>
+-		<string name="fox_modules_hdr">Complements de Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Instal·lar complement</string>
+ 		<string name="backup_short_hdr">Nova Còpia de Seguretat</string>
+ 		<string name="backups_wat">On són les còpies de seguretat?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Elimina el mòdul al proper inici</string>
+ 		<string name="mm_remove_hint">Reinicia perquè els canvis tinguin efecte</string>
+ 		<string name="mm_remove_reboot">Reinicia</string>
+-		<string name="magisk_not_found">No s'ha trobat Magisk!</string>
+-		<string name="magisk_not_found_1">Vols anar als Addons de Fox</string>
+-		<string name="magisk_not_found_2">i instal·lar Magisk precompilat?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Mòduls d'APatch</string>
+diff --git a/gui/theme/common/languages/cs_CZ.xml b/gui/theme/common/languages/cs_CZ.xml
+index 350f1784b..0d8253689 100644
+--- a/gui/theme/common/languages/cs_CZ.xml
++++ b/gui/theme/common/languages/cs_CZ.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Vyhledávání souborů a složek...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Změny se projeví po restartu</string>
+-		<string name="fox_modules_hdr">Fox doplňky</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Instalovat doplňky</string>
+ 		<string name="backup_short_hdr">Nová záloha</string>
+ 		<string name="backups_wat">Kde jsou zálohy?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Odstranit modul při příštím startu</string>
+ 		<string name="mm_remove_hint">Změny se projeví po restartu</string>
+ 		<string name="mm_remove_reboot">Restartovat</string>
+-		<string name="magisk_not_found">Magisk nenalezen!</string>
+-		<string name="magisk_not_found_1">Chcete přejít do Fox Addons</string>
+-		<string name="magisk_not_found_2">a nainstalovat předpřipravený Magisk?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch moduly</string>
+diff --git a/gui/theme/common/languages/de_DE.xml b/gui/theme/common/languages/de_DE.xml
+index 9dde2b82c..dedf43266 100644
+--- a/gui/theme/common/languages/de_DE.xml
++++ b/gui/theme/common/languages/de_DE.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Suche Dateien und Ordner…</string>
+ 		
+ 		<string name="reboot_to_take_effect">Neustart, damit die Änderungen wirksam werden</string>
+-		<string name="fox_modules_hdr">Fox Addons</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Addon installieren</string>
+ 		<string name="backup_short_hdr">Neues Backup</string>
+ 		<string name="backups_wat">Wo sind die Sicherungen?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Modul beim nächsten Booten entfernen</string>
+ 		<string name="mm_remove_hint">Neustart, damit die Änderungen wirksam werden</string>
+ 		<string name="mm_remove_reboot">Neustart</string>
+-		<string name="magisk_not_found">Magisk nicht gefunden!</string>
+-		<string name="magisk_not_found_1">Möchten Sie zu den Fox Addons gehen</string>
+-		<string name="magisk_not_found_2">und vorinstalliertes Magisk installieren?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch-Module</string>
+diff --git a/gui/theme/common/languages/el_GR.xml b/gui/theme/common/languages/el_GR.xml
+index 58a6f2551..de54602ce 100644
+--- a/gui/theme/common/languages/el_GR.xml
++++ b/gui/theme/common/languages/el_GR.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Όλα τα Αντίγραφα</string>
+ 		
+ 		<string name="reboot_to_take_effect">Επανεκκ. για εφαρμ. αλλαγών</string>
+-		<string name="fox_modules_hdr">Πρόσθετα Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Συμπίεση</string>
+ 		<string name="backup_short_hdr">Αποθ/Φόρτ ρυθμίσεων AromaFM</string>
+ 		<string name="backups_wat">Που θα δημιουργηθεί;</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Αφαιρέστε το πρόσθετο επόμενη εκκίνηση</string>
+ 		<string name="mm_remove_hint">Επανεκκ. για εφαρμ. αλλαγών</string>
+ 		<string name="mm_remove_reboot">Επανεκκίνηση</string>
+-		<string name="magisk_not_found">Εκτέλεση ADB στην εκκίνηση</string>
+-		<string name="magisk_not_found_1">Θέλετε να μεταβείτε στα Πρόσθετα Fox</string>
+-		<string name="magisk_not_found_2">και εγκατ. το προεγκ. Magisk;</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">ΜODULES APatch</string>
+diff --git a/gui/theme/common/languages/en.xml b/gui/theme/common/languages/en.xml
+index 7c64c5a8e..ef59ae93e 100644
+--- a/gui/theme/common/languages/en.xml
++++ b/gui/theme/common/languages/en.xml
+@@ -835,7 +835,7 @@
+ 		<string name="search_help">Search files and folders...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Reboot for changes to take effect</string>
+-		<string name="fox_modules_hdr">Fox Addons</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Install addon</string>
+ 		<string name="backup_short_hdr">New Backup</string>
+ 		<string name="backups_wat">Where are the backups?</string>
+@@ -947,9 +947,9 @@
+ 		<string name="mm_remove">Remove module next boot</string>
+ 		<string name="mm_remove_hint">Reboot for changes to take effect</string>
+ 		<string name="mm_remove_reboot">Reboot</string>
+-		<string name="magisk_not_found">Magisk not found!</string>
+-		<string name="magisk_not_found_1">Do you want to go to the Fox Addons</string>
+-		<string name="magisk_not_found_2">and install prebuilt Magisk?</string>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
+ 		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+@@ -971,7 +971,7 @@
+ 		<string name="fox_ota_lite">OTA &amp; ROM</string>
+ 		
+ 		<!-- About -->
+-		<string name="abt_maintainer">Maintainer</string>
++		<string name="abt_maintainer">Built by</string>
+ 		<string name="abt_fd">Theme creator &amp; designer</string>
+ 		<string name="abt_bork">CEO, Site &amp; UI</string>
+ 		<string name="abt_dj">Build system, legend maintainer</string>
+diff --git a/gui/theme/common/languages/fa_IR.xml b/gui/theme/common/languages/fa_IR.xml
+index edb6d5363..bbeaff388 100644
+--- a/gui/theme/common/languages/fa_IR.xml
++++ b/gui/theme/common/languages/fa_IR.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">جستجوی فایل ها و پوشه ها...</string>
+ 		
+ 		<string name="reboot_to_take_effect">راه‌اندازی مجدد کنید تا تغییرات اعمال شوند</string>
+-		<string name="fox_modules_hdr">افزونه های روباه</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">نصب افزونه</string>
+ 		<string name="backup_short_hdr">پشتیبان گیری جدید</string>
+ 		<string name="backups_wat">نسخه های پشتیبان کجا هستند؟</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">ماژول بوت بعدی را حذف کنید</string>
+ 		<string name="mm_remove_hint">راه‌اندازی مجدد کنید تا تغییرات اعمال شوند</string>
+ 		<string name="mm_remove_reboot">راه اندازی مجدد</string>
+-		<string name="magisk_not_found">مجیسک پیدا نشد!</string>
+-		<string name="magisk_not_found_1">آیا می خواهید به افزونه های روباه بروید</string>
+-		<string name="magisk_not_found_2">و مجیسک از پیش ساخته شده را نصب کنید؟</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">ماژول‌های APatch</string>
+diff --git a/gui/theme/common/languages/fr_FR.xml b/gui/theme/common/languages/fr_FR.xml
+index 90415d8f6..8494bc9f8 100644
+--- a/gui/theme/common/languages/fr_FR.xml
++++ b/gui/theme/common/languages/fr_FR.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Rechercher des fichiers et des dossiers...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Redémarrez pour que les modifications prennent effet</string>
+-		<string name="fox_modules_hdr">Extensions Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Installer l'extension</string>
+ 		<string name="backup_short_hdr">Nouvelle sauvegarde</string>
+ 		<string name="backups_wat">Où sont les sauvegardes ?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Supprimer le module au prochain démarrage</string>
+ 		<string name="mm_remove_hint">Redémarrez pour que les modifications prennent effet</string>
+ 		<string name="mm_remove_reboot">Redémarrer</string>
+-		<string name="magisk_not_found">Magisk introuvable !</string>
+-		<string name="magisk_not_found_1">Souhaitez-vous aller aux Fox Addons</string>
+-		<string name="magisk_not_found_2">et installer le Magisk préconstruit ?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Modules APatch</string>
+diff --git a/gui/theme/common/languages/he_IL.xml b/gui/theme/common/languages/he_IL.xml
+index f858a06f1..58d86948e 100644
+--- a/gui/theme/common/languages/he_IL.xml
++++ b/gui/theme/common/languages/he_IL.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">מחפש קבצים ותיקיות...</string>
+ 		
+ 		<string name="reboot_to_take_effect">אתחל מחדש כדי שהשינויים ייכנסו לתוקף</string>
+-		<string name="fox_modules_hdr">תוספים של Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">התקן תוסף</string>
+ 		<string name="backup_short_hdr">גיבוי חדש</string>
+ 		<string name="backups_wat">איפה הגיבויים?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">הסר מודול באתחול הבא</string>
+ 		<string name="mm_remove_hint">אתחל מחדש כדי שהשינויים ייכנסו לתוקף</string>
+ 		<string name="mm_remove_reboot">הפעלה מחדש</string>
+-		<string name="magisk_not_found">Magisk לא נמצא!</string>
+-		<string name="magisk_not_found_1">האם אתה רוצה ללכת לתוספי Fox</string>
+-		<string name="magisk_not_found_2">והתקן Magisk מוכן מראש?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">מודולי APatch</string>
+diff --git a/gui/theme/common/languages/hi_IN.xml b/gui/theme/common/languages/hi_IN.xml
+index 3dc8db5ab..f911b6f2e 100644
+--- a/gui/theme/common/languages/hi_IN.xml
++++ b/gui/theme/common/languages/hi_IN.xml
+@@ -835,7 +835,7 @@
+ 		<string name="search_help">फाइलें और फोल्डर खोजें...</string>
+ 		
+ 		<string name="reboot_to_take_effect">परिवर्तनों को प्रभावी करने के लिए पुनरारंभ करें</string>
+-		<string name="fox_modules_hdr">फॉक्स एडऑन</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">एडऑन इंस्टॉल करें</string>
+ 		<string name="backup_short_hdr">नया बैकअप</string>
+ 		<string name="backups_wat">बैकअप कहाँ हैं?</string>
+@@ -946,10 +946,10 @@
+ 		<string name="mm_remove">अगली बूट पर मॉड्यूल हटाएं</string>
+ 		<string name="mm_remove_hint">परिवर्तनों को प्रभावी करने के लिए पुनरारंभ करें</string>
+ 		<string name="mm_remove_reboot">रीबूट करें</string>
+-		<string name="magisk_not_found">मैजिक नहीं मिला!</string>
+-		<string name="magisk_not_found_1">क्या आप फॉक्स एडऑन पर जाना चाहते हैं</string>
+-		<string name="magisk_not_found_2">और पूर्व-निर्मित मैजिक इंस्टॉल करना चाहते हैं?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch मॉड्यूल</string>
+diff --git a/gui/theme/common/languages/id_ID.xml b/gui/theme/common/languages/id_ID.xml
+index 1993138b8..0d44d0901 100644
+--- a/gui/theme/common/languages/id_ID.xml
++++ b/gui/theme/common/languages/id_ID.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Mencari file dan folder...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Reboot agar perubahan berlaku</string>
+-		<string name="fox_modules_hdr">Addon C++</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Pasang addon</string>
+ 		<string name="backup_short_hdr">Cadangan Baru</string>
+ 		<string name="backups_wat">Di mana cadangannya?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Hapus modul mulai ulang selanjutnya</string>
+ 		<string name="mm_remove_hint">Reboot agar perubahan berlaku</string>
+ 		<string name="mm_remove_reboot">Mulai ulang</string>
+-		<string name="magisk_not_found">Magisk tidak ditemukan!</string>
+-		<string name="magisk_not_found_1">Apakah Anda ingin pergi ke Fox Addons</string>
+-		<string name="magisk_not_found_2">dan instal Magisk pra-bangun?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Modul APatch</string>
+diff --git a/gui/theme/common/languages/it_IT.xml b/gui/theme/common/languages/it_IT.xml
+index 0c2ec6ae9..7d5a6d295 100644
+--- a/gui/theme/common/languages/it_IT.xml
++++ b/gui/theme/common/languages/it_IT.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Cerca file e cartelle...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Riavviare per applicare le modifiche</string>
+-		<string name="fox_modules_hdr">Addons Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Installa addon</string>
+ 		<string name="backup_short_hdr">Nuovo Backup</string>
+ 		<string name="backups_wat">Dove sono i backup?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Rimuovi il modulo al prossimo avvio</string>
+ 		<string name="mm_remove_hint">Riavviare per applicare le modifiche</string>
+ 		<string name="mm_remove_reboot">Riavvia</string>
+-		<string name="magisk_not_found">Magisk non trovato!</string>
+-		<string name="magisk_not_found_1">Vuoi andare agli Addons di Fox</string>
+-		<string name="magisk_not_found_2">e installare Magisk precompilato?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Moduli APatch</string>
+diff --git a/gui/theme/common/languages/ja_JP.xml b/gui/theme/common/languages/ja_JP.xml
+index 9ee3248c4..699f09a9e 100644
+--- a/gui/theme/common/languages/ja_JP.xml
++++ b/gui/theme/common/languages/ja_JP.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">ファイルとフォルダを検索...</string>
+ 		
+ 		<string name="reboot_to_take_effect">変更を有効にするには再起動が必要です</string>
+-		<string name="fox_modules_hdr">Foxアドオン</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">アドオンをインストール</string>
+ 		<string name="backup_short_hdr">新しいバックアップ</string>
+ 		<string name="backups_wat">バックアップはどこにありますか?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">次回起動時にモジュールを削除</string>
+ 		<string name="mm_remove_hint">変更を有効にするために再起動</string>
+ 		<string name="mm_remove_reboot">再起動</string>
+-		<string name="magisk_not_found">Magiskが見つかりません！</string>
+-		<string name="magisk_not_found_1">Fox Addonsに行って</string>
+-		<string name="magisk_not_found_2">事前に構築されたMagiskをインストールしますか？</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatchモジュール</string>
+diff --git a/gui/theme/common/languages/ko_KR.xml b/gui/theme/common/languages/ko_KR.xml
+index 0c713168c..2c34ea368 100644
+--- a/gui/theme/common/languages/ko_KR.xml
++++ b/gui/theme/common/languages/ko_KR.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">파일 및 폴더를 찾는 중...</string>
+ 		
+ 		<string name="reboot_to_take_effect">변경 사항을 적용하려면 재부팅</string>
+-		<string name="fox_modules_hdr">Fox 애드온</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">애드온 설치</string>
+ 		<string name="backup_short_hdr">백업 만들기</string>
+ 		<string name="backups_wat">백업은 어디에 있나요?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">다음 부팅 시 모듈 제거</string>
+ 		<string name="mm_remove_hint">변경 사항을 적용하려면 재부팅</string>
+ 		<string name="mm_remove_reboot">재시작</string>
+-		<string name="magisk_not_found">Magisk를 찾을 수 없습니다!</string>
+-		<string name="magisk_not_found_1">Fox 추가 기능으로 이동하시겠습니까?</string>
+-		<string name="magisk_not_found_2">그리고 사전 구축된 Magisk를 설치하시겠습니까?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch 모듈</string>
+diff --git a/gui/theme/common/languages/nl_NL.xml b/gui/theme/common/languages/nl_NL.xml
+index 1c5950acc..9dd6966cb 100644
+--- a/gui/theme/common/languages/nl_NL.xml
++++ b/gui/theme/common/languages/nl_NL.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Bestanden en mappen zoeken...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Herstarten om wijzigingen toe te passen</string>
+-		<string name="fox_modules_hdr">Fox Addons</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Installeer addon</string>
+ 		<string name="backup_short_hdr">Nieuwe backup</string>
+ 		<string name="backups_wat">Waar zijn de back-ups?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Verwijder module volgende boot</string>
+ 		<string name="mm_remove_hint">Herstarten om wijzigingen toe te passen</string>
+ 		<string name="mm_remove_reboot">Herstarten</string>
+-		<string name="magisk_not_found">Magisk niet gevonden!</string>
+-		<string name="magisk_not_found_1">Wilt u naar de Fox Addons gaan</string>
+-		<string name="magisk_not_found_2">en voorgebouwd Magisk installeren?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch modules</string>
+diff --git a/gui/theme/common/languages/no_NO.xml b/gui/theme/common/languages/no_NO.xml
+index 12049289c..b3c1f7fad 100644
+--- a/gui/theme/common/languages/no_NO.xml
++++ b/gui/theme/common/languages/no_NO.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Søk etter filer og mapper...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Start på nytt for at endringene skal tre i kraft</string>
+-		<string name="fox_modules_hdr">Fox Tillegg</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Installer tillegg</string>
+ 		<string name="backup_short_hdr">Ny Sikkerhetskopi</string>
+ 		<string name="backups_wat">Hvor er sikkerhetskopiene?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Fjern modul ved neste oppstart</string>
+ 		<string name="mm_remove_hint">Start på nytt for at endringene skal tre i kraft</string>
+ 		<string name="mm_remove_reboot">Start på nytt</string>
+-		<string name="magisk_not_found">Magisk ikke funnet!</string>
+-		<string name="magisk_not_found_1">Ønsker du å gå til Fox Tillegg</string>
+-		<string name="magisk_not_found_2">og installere forhåndsbygget Magisk?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch moduler</string>
+diff --git a/gui/theme/common/languages/pl_PL.xml b/gui/theme/common/languages/pl_PL.xml
+index fd3769e68..c021fd4a0 100644
+--- a/gui/theme/common/languages/pl_PL.xml
++++ b/gui/theme/common/languages/pl_PL.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Wyszukiwarka plików i folderów...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Zrestartuj by zastosować zmiany</string>
+-		<string name="fox_modules_hdr">Dodatki Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Zainstaluj dodatki</string>
+ 		<string name="backup_short_hdr">Nowa kopia zapasowa</string>
+ 		<string name="backups_wat">Gdzie są kopie zapasowe?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Usuń moduł przy następnym uruchomieniu</string>
+ 		<string name="mm_remove_hint">Zrestartuj by zastosować zmiany</string>
+ 		<string name="mm_remove_reboot">Uruchom ponownie</string>
+-		<string name="magisk_not_found">Nie znaleziono Magisk!</string>
+-		<string name="magisk_not_found_1">Czy chcesz przejść do Fox Addons</string>
+-		<string name="magisk_not_found_2">zainstalować Magisk?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Moduły APatch</string>
+diff --git a/gui/theme/common/languages/pt_BR.xml b/gui/theme/common/languages/pt_BR.xml
+index c5cba5375..8f65bd4a8 100644
+--- a/gui/theme/common/languages/pt_BR.xml
++++ b/gui/theme/common/languages/pt_BR.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Pesquisar arquivos e pastas...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Reiniciar para as alterações terem efeito</string>
+-		<string name="fox_modules_hdr">Addons de Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Instalar addon</string>
+ 		<string name="backup_short_hdr">Novo Backup</string>
+ 		<string name="backups_wat">Onde estão os backups?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Remover módulo na próxima inicialização</string>
+ 		<string name="mm_remove_hint">Reiniciar para as alterações terem efeito</string>
+ 		<string name="mm_remove_reboot">Reiniciar</string>
+-		<string name="magisk_not_found">Magisk não encontrado!</string>
+-		<string name="magisk_not_found_1">Você quer ir para as Extensões do OrangeFox</string>
+-		<string name="magisk_not_found_2">e instalar o Magisk pré-construído?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Módulos APatch</string>
+diff --git a/gui/theme/common/languages/pt_PT.xml b/gui/theme/common/languages/pt_PT.xml
+index e45bea8b9..193ac77a6 100644
+--- a/gui/theme/common/languages/pt_PT.xml
++++ b/gui/theme/common/languages/pt_PT.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Pesquisar arquivos e pastas...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Reiniciar para que as alterações tenham efeito</string>
+-		<string name="fox_modules_hdr">Addons do Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Instalar addon</string>
+ 		<string name="backup_short_hdr">Novo Backup</string>
+ 		<string name="backups_wat">Onde estão os backups?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Remover módulo na próxima inicialização</string>
+ 		<string name="mm_remove_hint">Reiniciar para que as alterações tenham efeito</string>
+ 		<string name="mm_remove_reboot">Reiniciar</string>
+-		<string name="magisk_not_found">Magisk não encontrado!</string>
+-		<string name="magisk_not_found_1">Deseja ir para os Add-ons do Fox</string>
+-		<string name="magisk_not_found_2">e instalar o Magisk pré-construído?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Módulos APatch</string>
+diff --git a/gui/theme/common/languages/ro_RO.xml b/gui/theme/common/languages/ro_RO.xml
+index 766d1f03e..8736b2acc 100644
+--- a/gui/theme/common/languages/ro_RO.xml
++++ b/gui/theme/common/languages/ro_RO.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Căutați fișiere și dosare...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Repornește pentru ca modificările să intre în vigoare</string>
+-		<string name="fox_modules_hdr">Suplimente Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Instalare supliment</string>
+ 		<string name="backup_short_hdr">Copie de rezervă nouă</string>
+ 		<string name="backups_wat">Unde sunt copiile de rezervă?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Eliminare modul la următoarea pornire</string>
+ 		<string name="mm_remove_hint">Repornește pentru ca modificările să intre în vigoare</string>
+ 		<string name="mm_remove_reboot">Repornire</string>
+-		<string name="magisk_not_found">Magisk nu a fost găsit!</string>
+-		<string name="magisk_not_found_1">Doriți să mergeți la Fox Addons</string>
+-		<string name="magisk_not_found_2">și să instalați Magisk preconstruit?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Module APatch</string>
+diff --git a/gui/theme/common/languages/ru.xml b/gui/theme/common/languages/ru.xml
+index b22ae574d..c07345ec6 100644
+--- a/gui/theme/common/languages/ru.xml
++++ b/gui/theme/common/languages/ru.xml
+@@ -836,7 +836,7 @@
+ 		<string name="search_help">Поиск файлов и папок...</string>
+ 
+ 		<string name="reboot_to_take_effect">Перезагрузитесь для применения</string>
+-		<string name="fox_modules_hdr">Дополнения Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Установить дополнение</string>
+ 		<string name="backup_short_hdr">Новая копия</string>
+ 		<string name="backups_wat">А где резервные копии?</string>
+@@ -947,10 +947,10 @@
+ 		<string name="mm_remove">Удалить модуль при загрузке</string>
+ 		<string name="mm_remove_hint">Перезагрузитесь для удаления</string>
+ 		<string name="mm_remove_reboot">Продолжить</string>
+-		<string name="magisk_not_found">Magisk не найден!</string>
+-		<string name="magisk_not_found_1">Хотите ли вы перейти в</string>
+-		<string name="magisk_not_found_2">"Дополнения OrangeFox" и</string>
+-		<string name="magisk_not_found_3">установить Magisk?</string>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Модули APatch</string>
+diff --git a/gui/theme/common/languages/sr_Cyrl.xml b/gui/theme/common/languages/sr_Cyrl.xml
+index dd5541506..92bb35624 100644
+--- a/gui/theme/common/languages/sr_Cyrl.xml
++++ b/gui/theme/common/languages/sr_Cyrl.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Претражи датотеке и фолдере...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Рестартуј за промене да ступе на снагу</string>
+-		<string name="fox_modules_hdr">Fox Адони</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Инсталирај адон</string>
+ 		<string name="backup_short_hdr">Нова резервна копија</string>
+ 		<string name="backups_wat">Где су резервне копије?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Уклони модул при следећем покретању</string>
+ 		<string name="mm_remove_hint">Рестартуј да промене ступе на снагу</string>
+ 		<string name="mm_remove_reboot">Рестартуј</string>
+-		<string name="magisk_not_found">Magisk није пронађен!</string>
+-		<string name="magisk_not_found_1">Да ли желите да одете на Fox Addons</string>
+-		<string name="magisk_not_found_2">и инсталирате преграђен Magisk?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch модули</string>
+diff --git a/gui/theme/common/languages/th_TH.xml b/gui/theme/common/languages/th_TH.xml
+index 4c85bc07f..5f98d70e4 100644
+--- a/gui/theme/common/languages/th_TH.xml
++++ b/gui/theme/common/languages/th_TH.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">ค้นหาไฟล์และโฟลเดอร์</string>
+ 		
+ 		<string name="reboot_to_take_effect">รีบูตเพื่อให้การเปลี่ยนแปลงมีผล</string>
+-		<string name="fox_modules_hdr">Fox ปลั๊กอิน</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">ติดตั้งปลั๊กอิน</string>
+ 		<string name="backup_short_hdr">การสำรองข้อมูลใหม่</string>
+ 		<string name="backups_wat">การสำรองข้อมูลอยู่ที่ไหน?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">ถอดโมดูลออกเมื่อเริ่มต้นครั้งถัดไป</string>
+ 		<string name="mm_remove_hint">รีบูตเพื่อให้การเปลี่ยนแปลงมีผล</string>
+ 		<string name="mm_remove_reboot">รีบูต</string>
+-		<string name="magisk_not_found">ไม่พบ Magisk!</string>
+-		<string name="magisk_not_found_1">คุณนึกถึง Fox Plugin Center</string>
+-		<string name="magisk_not_found_2">และติดตั้ง Magisk ที่สร้างไว้ล่วงหน้า?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">โมดูล APatch</string>
+diff --git a/gui/theme/common/languages/tr_TR.xml b/gui/theme/common/languages/tr_TR.xml
+index 8a9d314b5..b74fd2057 100644
+--- a/gui/theme/common/languages/tr_TR.xml
++++ b/gui/theme/common/languages/tr_TR.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Dosyaları ve dizinleri ara...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Değişikliklerin geçerli olması için yeniden başlatın</string>
+-		<string name="fox_modules_hdr">Fox Eklentileri</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Eklenti yükle</string>
+ 		<string name="backup_short_hdr">Yeni yedek oluştur</string>
+ 		<string name="backups_wat">Yedeklemeler nerede?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Modülü bir sonraki önyüklemede kaldır</string>
+ 		<string name="mm_remove_hint">Değişikliklerin geçerli olması için yeniden başlatın</string>
+ 		<string name="mm_remove_reboot">Yeniden Başlatma</string>
+-		<string name="magisk_not_found">Magisk bulunamadı!</string>
+-		<string name="magisk_not_found_1">Fox Eklentilerine gitmek ister misiniz?</string>
+-		<string name="magisk_not_found_2">ve önceden oluşturulmuş Magisk'i yüklemek?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">APatch modülleri</string>
+diff --git a/gui/theme/common/languages/uk_UA.xml b/gui/theme/common/languages/uk_UA.xml
+index a72fe7869..529d2685d 100644
+--- a/gui/theme/common/languages/uk_UA.xml
++++ b/gui/theme/common/languages/uk_UA.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">★ Пошук файлів і папок...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Перезавантаження для застосування змін</string>
+-		<string name="fox_modules_hdr">Fox аддони</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Встановити аддон</string>
+ 		<string name="backup_short_hdr">Нова резервна копія</string>
+ 		<string name="backups_wat">Де резервні копії?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Видалити модуль після перезавантаження</string>
+ 		<string name="mm_remove_hint">Перезавантаження для застосування змін</string>
+ 		<string name="mm_remove_reboot">Перезавантаження</string>
+-		<string name="magisk_not_found">Magisk не знайдено!</string>
+-		<string name="magisk_not_found_1">Ви хочете перейти в "Доповнення Fox"</string>
+-		<string name="magisk_not_found_2">та встановити попередньо зібраний Magisk?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Модулі APatch</string>
+diff --git a/gui/theme/common/languages/vi_VN.xml b/gui/theme/common/languages/vi_VN.xml
+index 111d19de5..17502042a 100644
+--- a/gui/theme/common/languages/vi_VN.xml
++++ b/gui/theme/common/languages/vi_VN.xml
+@@ -834,7 +834,7 @@
+ 		<string name="search_help">Xóa các tập tin và thư mục...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Khởi động lại để thay đổi hiệu ứng</string>
+-		<string name="fox_modules_hdr">Fox Addons</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Cài addon</string>
+ 		<string name="backup_short_hdr">Sao lưu mới</string>
+ 		<string name="backups_wat">Sao lưu của tôi ở đâu?</string>
+@@ -945,10 +945,10 @@
+ 		<string name="mm_remove">Gỡ module vào lần khởi động tiếp theo</string>
+ 		<string name="mm_remove_hint">Khởi động lại để thay đổi hiệu ứng</string>
+ 		<string name="mm_remove_reboot">Khởi động lại</string>
+-		<string name="magisk_not_found">Không tìm thấy Magisk!</string>
+-		<string name="magisk_not_found_1">Bạn có muốn đi tới Fox Addons</string>
+-		<string name="magisk_not_found_2">và cài đặt Magisk được dựng sẵn?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 
+ 		<!-- APatch / KernelSU modules -->
+ 		<string name="ap_modules">Mô-đun APatch</string>
+diff --git a/gui/theme/extra-languages/languages/es-ES.xml b/gui/theme/extra-languages/languages/es-ES.xml
+index f2e864f14..7f28e973e 100644
+--- a/gui/theme/extra-languages/languages/es-ES.xml
++++ b/gui/theme/extra-languages/languages/es-ES.xml
+@@ -829,7 +829,7 @@
+ 		<string name="search_help">Buscar archivos y carpetas...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Reiniciar para que los cambios surtan efecto</string>
+-		<string name="fox_modules_hdr">Añadidos Fox</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Instalar addon</string>
+ 		<string name="backup_short_hdr">Nueva copia de seguridad</string>
+ 		<string name="backups_wat">Instalar</string>
+@@ -935,10 +935,10 @@
+ 		<string name="mm_modules">Módulos</string>
+ 		<string name="mm_ver">Versión de Magisk</string>
+ 		<string name="mm_mod_ver">Versión del módulo</string>
+-		<string name="magisk_not_found">¡Magisk no encontrado!</string>
+-		<string name="magisk_not_found_1">¿Quieres ir a Fox Addons</string>
+-		<string name="magisk_not_found_2">e instalar Magisk precompilado?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 		
+ 		<!-- MIUI OTA -->
+ 		<string name="fox_ota_settings">Ajustes OTA</string>
+diff --git a/gui/theme/extra-languages/languages/hu.xml b/gui/theme/extra-languages/languages/hu.xml
+index e5780aec1..c015d4c80 100644
+--- a/gui/theme/extra-languages/languages/hu.xml
++++ b/gui/theme/extra-languages/languages/hu.xml
+@@ -822,7 +822,7 @@
+ 		<string name="search_help">Fájlok és könyvtárak keresése...</string>
+ 		
+ 		<string name="reboot_to_take_effect">Újraindítás a változtatások érvénybe léptetéséhez</string>
+-		<string name="fox_modules_hdr">Fox kiegészítők</string>
++		<string name="fox_modules_hdr">晓宇插件</string>
+ 		<string name="fox_modules_inst">Kiegészítő telepítése</string>
+ 		<string name="backup_short_hdr">Új mentés</string>
+ 		<string name="backups_wat">Hol vannak a mentések?</string>
+@@ -928,10 +928,10 @@
+ 		<string name="mm_modules">Modulok</string>
+ 		<string name="mm_ver">Magisk-verzió</string>
+ 		<string name="mm_mod_ver">Modulverzió</string>
+-		<string name="magisk_not_found">A Magisk nem található!</string>
+-		<string name="magisk_not_found_1">Be kíván lépni a Fox kiegészítőkbe</string>
+-		<string name="magisk_not_found_2">és telepíteni a beépített Magisk-et?</string>
+-		<string name="magisk_not_found_3"/>
++		<string name="magisk_not_found">未发现SU&amp;管理器</string>
++		<string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++		<string name="magisk_not_found_2"></string>
++		<string name="magisk_not_found_3"></string>
+ 		
+ 		<!-- MIUI OTA -->
+ 		<string name="fox_ota_settings">OTA-beállítások</string>
+diff --git a/gui/theme/extra-languages/languages/zh_CN.xml b/gui/theme/extra-languages/languages/zh_CN.xml
+index 16d106691..ad90381cb 100644
+--- a/gui/theme/extra-languages/languages/zh_CN.xml
++++ b/gui/theme/extra-languages/languages/zh_CN.xml
+@@ -404,7 +404,7 @@
+         <string name="no_kernel_selinux">内核不支持读取 SELinux Contexts。</string>
+         <string name="full_selinux">存在完整的 SELinux 支持。</string>
+         <string name="no_selinux">没有 SELinux 支持 (无 libselinux) 。</string>
+-        <string name="mtp_enabled">找不到 Media 存储。</string>
++        <string name="mtp_enabled">MTP 已启用</string>
+         <string name="mtp_disabled">已禁用 MTP</string>
+         <string name="mtp_crash">MTP 崩溃，不在启动时启用 MTP。</string>
+         <string name="decrypt_success">成功使用默认密码解密。</string>
+@@ -821,7 +821,7 @@
+         <string name="fox_save_load_aromafm_config_chk">保存/加载 Aroma 文件管理设置</string>
+         <string name="search_help">搜索文件和文件夹</string>
+         <string name="reboot_to_take_effect">重启以使改动生效</string>
+-        <string name="fox_modules_hdr">Fox 插件</string>
++        <string name="fox_modules_hdr">晓宇插件</string>
+         <string name="fox_modules_inst">安装插件</string>
+         <string name="backup_short_hdr">新建备份</string>
+         <string name="backups_wat">暂无备份</string>
+@@ -920,10 +920,10 @@
+         <string name="mm_remove">下次启动时移除模块</string>
+         <string name="mm_remove_hint">重启以使改动生效</string>
+         <string name="mm_remove_reboot">重启</string>
+-        <string name="magisk_not_found">未发现Magisk!</string>
+-        <string name="magisk_not_found_1">您想到Fox插件中心</string>
+-        <string name="magisk_not_found_2">安装预装的Magisk吗？</string>
+-        <string name="magisk_not_found_3" />
++        <string name="magisk_not_found">未发现SU&amp;管理器</string>
++        <string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++        <string name="magisk_not_found_2"></string>
++        <string name="magisk_not_found_3"></string>
+         <!-- APatch / KernelSU modules -->
+         <string name="ap_modules">APatch模块</string>
+         <string name="ap_ver">APatch版本</string>
+@@ -940,7 +940,7 @@
+         <string name="fox_patch_rom">Patch ROM</string>
+         <string name="fox_ota_lite">OTA &amp; ROM</string>
+         <!-- About -->
+-        <string name="abt_maintainer">维护人员</string>
++        <string name="abt_maintainer">编译作者</string>
+         <string name="abt_fd">主题创建者 &amp; 设计师</string>
+         <string name="abt_bork">CEO，网站 &amp; 界面</string>
+         <string name="abt_dj">构建系统，维护者简介</string>
+diff --git a/gui/theme/extra-languages/languages/zh_TW.xml b/gui/theme/extra-languages/languages/zh_TW.xml
+index bd674c3a5..d33a57d09 100644
+--- a/gui/theme/extra-languages/languages/zh_TW.xml
++++ b/gui/theme/extra-languages/languages/zh_TW.xml
+@@ -393,7 +393,7 @@
+         <string name="no_kernel_selinux">內核不支援讀取 SELinux Contexts。</string>
+         <string name="full_selinux">存在完整的 SELinux 支援。</string>
+         <string name="no_selinux">沒有 SELinux 支援 (無 libselinux) 。</string>
+-        <string name="mtp_enabled">找不到 Media 儲存。</string>
++        <string name="mtp_enabled">MTP 已啟用</string>
+         <string name="mtp_disabled">已停用 MTP</string>
+         <string name="mtp_crash">MTP 崩潰，不在啟動時啟用 MTP。</string>
+         <string name="decrypt_success">成功使用預設密碼解密。</string>
+@@ -810,7 +810,7 @@
+         <string name="fox_save_load_aromafm_config_chk">儲存/載入 Aroma 檔案管理設定</string>
+         <string name="search_help">搜尋檔案和資料夾</string>
+         <string name="reboot_to_take_effect">重新啟動以使改動生效</string>
+-        <string name="fox_modules_hdr">Fox 插件</string>
++        <string name="fox_modules_hdr">晓宇插件</string>
+         <string name="fox_modules_inst">安裝插件</string>
+         <string name="backup_short_hdr">新建備份</string>
+         <string name="backups_wat">暫無備份</string>
+@@ -909,10 +909,10 @@
+         <string name="mm_remove">下次啟動時移除模組</string>
+         <string name="mm_remove_hint">重新啟動以使改動生效</string>
+         <string name="mm_remove_reboot">重新啟動</string>
+-        <string name="magisk_not_found">未發現Magisk!</string>
+-        <string name="magisk_not_found_1">您想到Fox插件中心</string>
+-        <string name="magisk_not_found_2">安裝預裝的Magisk嗎？</string>
+-        <string name="magisk_not_found_3" />
++        <string name="magisk_not_found">未发现SU&amp;管理器</string>
++        <string name="magisk_not_found_1">请安装SU&amp;管理器再进行操作</string>
++        <string name="magisk_not_found_2"></string>
++        <string name="magisk_not_found_3"></string>
+         <!-- APatch / KernelSU modules -->
+         <string name="ap_modules">APatch模組</string>
+         <string name="ap_ver">APatch版本</string>
