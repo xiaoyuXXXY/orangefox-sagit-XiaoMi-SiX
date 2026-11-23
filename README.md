@@ -158,8 +158,34 @@ V48 是 recovery 镜像本体；含签名与附加文件的完整卡刷包在此
 
 ---
 
+## 发布到 GitHub
+
+仓库已经初始化并提交（`main` 分支 + `v48` 标签），直接推即可：
+
+```bash
+cd OrangeFox-sagit-Source
+
+# 先在 GitHub 网页建一个空仓库（不要勾 README / .gitignore / license）
+git remote add origin git@github.com:<你的用户名>/<仓库名>.git
+git push -u origin main
+git push origin v48
+```
+
+用 `gh` 更省事：
+
+```bash
+gh auth login
+gh repo create orangefox-sagit --public --source=. --push
+git push origin v48
+```
+
+> 仓库约 47 MB（其中 35 MB 是三个预编译内核）。不需要预编译内核的话，可以删掉 `device/xiaomi/sagit/prebuilt/` 并在 README 里注明来源，仓库会降到 12 MB。
+
+---
+
 ## 更多
 
 - **[docs/V1-V48-开发全记录.md](docs/V1-V48-开发全记录.md)** —— 83 个版本节点、七个阶段、五个值得记住的 bug
 - **[docs/构建指南.md](docs/构建指南.md)** —— 环境依赖、编译、刷机、验证、排错
-- **[docs/技术细节.md](docs/技术细节.md)** —— 关键改动的代码级说明（滚动、扩容、格式化分支、AB slot 探测）
+- **[docs/技术细节.md](docs/技术细节.md)** —— 关键改动的代码级说明（滚动、扩容、格式化分支、f2fs 兼容）
+- **[docs/OrangeFox-V1-V48-完整记录.pdf](docs/OrangeFox-V1-V48-完整记录.pdf)** —— 上面三份合并排版（24 页，含封面与目录），适合直接转发
